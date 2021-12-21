@@ -1,0 +1,4 @@
+Warning[205] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\2_BAS_GERI SAYMA.X\2_BAS_GERI_SAYMA.ASM 1 : Found directive in column 1. (list)
+Message[302] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\2_BAS_GERI SAYMA.X\2_BAS_GERI_SAYMA.ASM 82 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\2_BAS_GERI SAYMA.X\2_BAS_GERI_SAYMA.ASM 86 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\2_BAS_GERI SAYMA.X\2_BAS_GERI_SAYMA.ASM 92 : Register in operand not in bank 0.  Ensure that bank bits are correct.

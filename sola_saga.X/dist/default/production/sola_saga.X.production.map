@@ -1,0 +1,55 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Sun Oct 31 14:30:52 2021
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000004
+                   .cinit    romdata   0x000002    program   0x000004
+                   .org_1       code   0x000004    program   0x000058
+.config_2007_BUILD/DEFAULT/PRODUCTION/SOLA_SA       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x00002f      
+                            0x002007    0x002007      
+            49 out of 8454 program addresses used, program memory utilization is 0%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    BASLA   0x000022    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    DONGU   0x00002b    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                  GECIKME   0x000004    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    LOOP1   0x00000a    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    LOOP2   0x000008    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    LOOP3   0x000006    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                  SAGAGIT   0x000014    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+               SAGKONTROL   0x00001d    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                  SOLAGIT   0x000016    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+               SOLKONTROL   0x000018    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    SSDON   0x000011    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  GECIKME   0x000004    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    LOOP3   0x000006    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    LOOP2   0x000008    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    LOOP1   0x00000a    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    SSDON   0x000011    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                  SAGAGIT   0x000014    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                  SOLAGIT   0x000016    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+               SOLKONTROL   0x000018    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+               SAGKONTROL   0x00001d    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    BASLA   0x000022    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+                    DONGU   0x00002b    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\sola_saga.X\sola_saga.asm
+
+

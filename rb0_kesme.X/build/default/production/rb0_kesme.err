@@ -1,0 +1,4 @@
+Message[305] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\RB0_KESME.X\RB0_KESME.ASM 36 : Using default destination of 1 (file).
+Message[302] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\RB0_KESME.X\RB0_KESME.ASM 44 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\RB0_KESME.X\RB0_KESME.ASM 49 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Warning[205] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\RB0_KESME.X\RB0_KESME.ASM 61 : Found directive in column 1. (END)

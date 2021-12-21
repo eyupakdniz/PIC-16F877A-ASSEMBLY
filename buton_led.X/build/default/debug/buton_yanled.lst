@@ -1,0 +1,579 @@
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 
+                      00002 ; KODLAMA SABLONU
+                      00003 
+                      00004         list            p=16f877A       ; hangi pic
+                      00005         #include        <p16f877A.inc>  ; SFR register 'larÄ±n tanÄ±mlandÄ±Ä?Ä± kutuphane
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Mar 17 2019
+                      00005 ;  MPASM PIC16F877A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2019 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00567         LIST
+                      00006         
+2007   3F31           00007         __CONFIG    H'3F31'
+                      00008 
+                      00009 ;KULLANILACAK DEGISKENLER
+                      00010 
+  00000020            00011 D1      EQU 0x20   ;Buradaki ismi degistirebilir ve yenileri eklenebilir
+  00000021            00012 D2      EQU 0x21
+  00000022            00013 D3      EQU 0x22
+                      00014 
+                      00015 ;***** Kesme durumunda kaydedilmesi gereken SFR ler icin kullanilacak yardimci degiskenler
+                      00016                                 
+  0000007D            00017 w_temp          EQU     0x7D            
+  0000007E            00018 status_temp     EQU     0x7E            
+  0000007F            00019 pclath_temp     EQU     0x7F
+                      00020 ;********************************************************************************************
+                      00021         ORG     0x000                   ; Baslama vektoru
+                      00022 
+0000   0000           00023         nop                             ; ICD ozelliginin aktif edilmesi icin gereken bekleme 
+0001   2???           00024         goto    BASLA                   ; baslama etiketine gir
+                      00025 
+                      00026         
+                      00027 ;**********************************************************************************************
+                      00028         ORG     0x004                   ; kesme vektoru
+                      00029 
+                      00030         
+                      00031 ;***********************************************************************************************
+                      00032 
+0004                  00033 GECIKME
+                      00034 
+0004   30FF           00035         MOVLW   0XFF  
+0005   00A1           00036         MOVWF   D2   
+0006                  00037 LOOP2
+0006   30FF           00038         MOVLW   0XFF    
+0007   00A0           00039         MOVWF   D1      
+                      00040         
+0008                  00041 LOOP1
+0008   0BA0           00042         DECFSZ  D1,F    
+0009   2???           00043         GOTO    LOOP1
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00044         
+000A   0BA1           00045         DECFSZ  D2,F    
+000B   2???           00046         GOTO    LOOP2
+                      00047         
+000C   0008           00048         RETURN
+000D                  00049 PORTA_AYARLA
+000D   1683 1303      00050         BANKSEL     TRISA
+000F   3006           00051         MOVLW       0X06    ;dijital input-output ypar alttaki komut ile
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0010   009F           00052         MOVWF       ADCON1  ;ADC pasif hale getirir(SAYISAL G?R?? HALINE GET?R?LD?)
+0011   303F           00053         MOVLW       b'00111111'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0012   0085           00054         MOVWF       TRISA   ;TRISA ya 3F de?erini yükledik
+0013   1283           00055         BCF         STATUS,RP0 ; bank0(00) geç
+0014   0008           00056         RETURN
+                      00057         
+0015                  00058 PORTB_AYARLA
+0015   1683 1303      00059         BANKSEL     TRISB
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0017   0186           00060         CLRF        TRISB
+0018   1283 1303      00061         BANKSEL     PORTB
+001A   0186           00062         CLRF        PORTB
+001B   0008           00063         RETURN
+                      00064         
+                      00065         
+001C                  00066 BASLA
+001C   2???           00067      CALL       PORTA_AYARLA
+001D   2???           00068      CALL       PORTB_AYARLA
+                      00069 
+001E                  00070 KONTROL       ;PULL-UP ÇALI?IYOR
+001E   1C05           00071      BTFSS      PORTA,0     ;PORTA'n?n 0.biti 1(pull-up oldu?u için) diye kontrol et
+001F   2???           00072      GOTO       YAK_0
+0020   1C85           00073      BTFSS      PORTA,1     ;PORTA'n?n 1.biti 1(pull-up oldu?u için) diye kontrol et
+0021   2???           00074      GOTO       YAK_1
+0022   1D05           00075      BTFSS      PORTA,2     ;PORTA'n?n 2.biti 1(pull-up oldu?u için) diye kontrol et
+0023   2???           00076      GOTO       YAK_2
+0024   1D85           00077      BTFSS      PORTA,3     ;PORTA'n?n 3.biti 1(pull-up oldu?u için) diye kontrol et
+0025   2???           00078      GOTO       YAK_3
+0026   1E05           00079      BTFSS      PORTA,4     ;PORTA'n?n 4.biti 1(pull-up oldu?u için) diye kontrol et
+0027   2???           00080      GOTO       YAK_4
+0028   1E85           00081      BTFSS      PORTA,5     ;PORTA'n?n 5.biti 1(pull-up oldu?u için) diye kontrol et
+0029   2???           00082      GOTO       YAK_5
+002A   2???           00083      GOTO       KONTROL
+                      00084      
+                      00085      
+002B                  00086 YAK_0
+002B   3001           00087      MOVLW      b'00000001'
+002C   0086           00088      MOVWF      PORTB
+002D   2???           00089      GOTO       TEKRAR
+                      00090      
+002E                  00091 YAK_1
+002E   3002           00092      MOVLW      b'00000010'
+002F   0086           00093      MOVWF      PORTB
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0030   2???           00094      GOTO       TEKRAR
+                      00095    
+0031                  00096 YAK_2
+0031   3004           00097      MOVLW      b'00000100'
+0032   0086           00098      MOVWF      PORTB
+0033   2???           00099      GOTO       TEKRAR
+                      00100  
+0034                  00101 YAK_3
+0034   3008           00102      MOVLW      b'00001000'
+0035   0086           00103      MOVWF      PORTB
+0036   2???           00104      GOTO       TEKRAR
+                      00105      
+0037                  00106 YAK_4
+0037   3010           00107      MOVLW      b'00010000'
+0038   0086           00108      MOVWF      PORTB
+0039   2???           00109      GOTO       TEKRAR
+                      00110      
+003A                  00111 YAK_5
+003A   3020           00112      MOVLW      b'00100000'
+003B   0086           00113      MOVWF      PORTB
+003C   2???           00114      GOTO       TEKRAR
+                      00115      
+003D                  00116 TEKRAR  ;B?RDEN FAZLA GOTO KOMUTU KULLANIYORSANINZ YER?N?Z? KAYBETMEMEK ?Ç?N YAPILIR
+003D   2???           00117     CALL        GECIKME
+003E   2???           00118     CALL        SIFIRLA
+003F   2???           00119     GOTO        KONTROL
+                      00120     
+0040                  00121 SIFIRLA
+0040   0186           00122     CLRF        PORTB
+0041   0008           00123     RETURN
+                      00124 
+3F31                  00125         END                       ; Program sonu
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+BASLA                             0000001C
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CIS                               00000003
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+D1                                00000020
+D2                                00000021
+D3                                00000022
+DATA_ADDRESS                      00000005
+DC                                00000001
+D_A                               00000005
+D_NOT_A                           00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GCEN                              00000007
+GECIKME                           00000004
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+KONTROL                           0000001E
+LOOP1                             00000008
+LOOP2                             00000006
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTA_AYARLA                      0000000D
+PORTB                             00000006
+PORTB_AYARLA                      00000015
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+R                                 00000002
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+SEN                               00000000
+SIFIRLA                           00000040
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TEKRAR                            0000003D
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE  9
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+W                                 00000000
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+WRERR                             00000003
+YAK_0                             0000002B
+YAK_1                             0000002E
+YAK_2                             00000031
+YAK_3                             00000034
+YAK_4                             00000037
+YAK_5                             0000003A
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+__DEBUG                           
+__MPLAB_DEBUGGER_SIMULATOR        1
+pclath_temp                       0000007F
+status_temp                       0000007E
+w_temp                            0000007D
+
+MPASM 5.84                  BUTON_YANLED.ASM   10-31-2021  17:47:16         PAGE 11
+
+
+
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     3 reported,     0 suppressed
+
+

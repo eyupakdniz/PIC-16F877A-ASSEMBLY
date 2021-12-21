@@ -1,0 +1,7 @@
+Warning[205] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\TMR0_.X\TMRO_.ASM 10 : Found directive in column 1. (ORG)
+Warning[203] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\TMR0_.X\TMRO_.ASM 11 : Found opcode in column 1. (NOP)
+Warning[203] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\TMR0_.X\TMRO_.ASM 12 : Found opcode in column 1. (GOTO)
+Warning[205] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\TMR0_.X\TMRO_.ASM 15 : Found directive in column 1. (ORG)
+Message[302] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\TMR0_.X\TMRO_.ASM 47 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\TMR0_.X\TMRO_.ASM 52 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Warning[205] C:\USERS\EYüP AKDENÝZ\DESKTOP\NEW FOLDER\TMR0_.X\TMRO_.ASM 63 : Found directive in column 1. (END)

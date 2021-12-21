@@ -1,0 +1,637 @@
+	list		p=16f877A	
+	#include	<p16f877A.inc>	
+	
+	__CONFIG    H'3F31'
+
+;KULLANILACAK DEGISKENLER
+G1	EQU 0x20
+G2	EQU 0x21
+DELAYY	EQU 0x22
+BIRLER	EQU 0x23
+ONLAR	EQU 0x24
+SAYAC	EQU 0x25
+SAYAC2	EQU 0x26	
+;***** Kesme durumunda kaydedilmesi gereken SFR ler icin kullanilacak yardimci degiskenler
+				
+w_temp		EQU	0x7D		
+status_temp	EQU	0x7E		
+pclath_temp	EQU	0x7F
+;********************************************************************************************
+	ORG     0x00             	 
+
+	NOP			  	
+  	GOTO    BASLA              	 
+
+	
+;**********************************************************************************************
+	ORG     0x04             	
+
+;***********************************************************************************************
+LOOK_UP
+	ADDWF	    PCL,1
+	RETLW	    0x3F
+	RETLW	    0x06
+	RETLW	    0x5B
+	RETLW	    0x4F
+	RETLW	    0x66
+	RETLW	    0x6D
+	RETLW	    0x7D
+	RETLW	    0x07
+	RETLW	    0x7F
+	RETLW	    0x6F
+;***********************************************************************************************
+GECIKME	
+	MOVLW	    0x0D
+	MOVWF	    G1
+	
+	MOVLW	    0xFF
+	MOVWF	    G2
+LOOP
+	DECFSZ	    G2,1
+	GOTO	    LOOP
+	
+	DECFSZ	    G1,1
+	GOTO	    LOOP
+	
+	RETURN
+	
+BASLA
+	BANKSEL	    ADCON1
+	MOVLW	    0x06
+	MOVWF	    ADCON1
+	
+	BANKSEL	    TRISA
+	MOVLW	    B'00001000'
+	MOVWF	    TRISA
+	
+	BANKSEL	    PORTA
+	CLRF	    PORTA
+	BANKSEL	    TRISB
+	CLRF	    TRISB
+	
+	BANKSEL	    PORTB
+	CLRF	    PORTB
+	
+	BANKSEL	    TRISC
+	CLRF	    TRISC
+	
+	BANKSEL	    PORTC
+	CLRF	    PORTC
+
+	CLRF	    ONLAR
+	CLRF	    BIRLER
+
+BUTTON
+	BTFSS	    PORTA,3
+	GOTO	    BUTTON
+	GOTO	    DONGU
+	
+DONGU
+	BCF	    STATUS,Z
+	MOVLW	    D'10'
+	MOVWF	    DELAYY
+	
+	MOVLW	    D'10'
+	SUBWF	    BIRLER,W
+	BTFSS	    STATUS,Z
+	GOTO	    ISLEM1
+	GOTO	    ISLEM2
+	
+ISLEM1
+	MOVLW	    B'00000010'
+	MOVWF	    PORTC
+	MOVF	    BIRLER,W
+	CALL	    LOOK_UP
+	MOVWF	    PORTB
+	CALL	    GECIKME
+	
+	MOVLW	    B'00000001'
+	MOVWF	    PORTC
+	MOVF	    ONLAR,W
+	CALL	    LOOK_UP
+	MOVWF	    PORTB
+	CALL	    GECIKME
+	DECFSZ	    DELAYY,1
+	GOTO	    ISLEM1
+	MOVLW	    D'2'
+	ADDWF	    BIRLER,1
+	GOTO	    BUTTON
+		
+ISLEM2
+	CLRF	    BIRLER
+	INCF	    ONLAR,1
+	MOVLW	    D'10'
+	SUBWF	    ONLAR,W
+	BTFSS	    STATUS,Z
+	GOTO	    BUTTON
+	CLRF	    ONLAR
+	GOTO	    BUTTON
+	
+	
+	
+;BUTTON
+;	BTFSS	    PORTA,3
+;	GOTO	    BUTTON
+;	GOTO	    DONGU
+;	
+;DONGU
+;	BCF	    STATUS,Z
+;	MOVLW	    D'10'
+;	MOVWF	    DELAYY
+;	
+;	MOVLW	    D'10'
+;	SUBWF	    BIRLER,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;	
+;ISLEM1
+;	MOVLW	    B'00000010'
+;	MOVWF	    PORTC
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTC
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	DECFSZ	    DELAYY,1
+;	GOTO	    ISLEM1
+;	MOVLW	    D'2'
+;	ADDWF	    BIRLER,1
+;	GOTO	    DONGU
+;	
+;
+;	
+;ISLEM2
+;	CLRF	    BIRLER
+;	INCF	    ONLAR,1
+;	MOVLW	    D'10'
+;	SUBWF	    ONLAR,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	CLRF	    ONLAR
+;	GOTO	    DONGU
+
+;;5 5 AZALTMA	
+;	MOVLW	    D'8'
+;	MOVWF	    BIRLER
+;	
+;	MOVLW	    D'2'
+;	MOVWF	    ONLAR
+
+;KAT_5
+;	BCF	    STATUS,Z
+;	MOVLW	    D'5'
+;	SUBWF	    BIRLER,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    KAT_0
+;	GOTO	    DONGU
+;	
+;KAT_0
+;	BCF	    STATUS,Z
+;	MOVLW	    D'0'
+;	SUBWF	    BIRLER,W
+;	BTFSC	    STATUS,Z
+;	GOTO	    DONGU
+;	DECF	    BIRLER,1
+;	GOTO	    KAT_5
+;	
+;DONGU
+;	BCF	    STATUS,Z
+;	MOVLW	    D'10'
+;	MOVWF	    DELAYY
+;	
+;	MOVLW	    D'251'
+;	SUBWF	    BIRLER,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;	
+;ISLEM1
+;	MOVLW	    B'00000010'
+;	MOVWF	    PORTC
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTC
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	DECFSZ	    DELAYY,1
+;	GOTO	    ISLEM1
+;	MOVLW	    D'5'
+;	SUBWF	    BIRLER,1
+;	GOTO	    DONGU
+;	
+;ISLEM2
+;	BCF	    STATUS,Z
+;	MOVLW	    D'5'
+;	MOVWF	    BIRLER
+;	DECF	    ONLAR,1
+;	MOVLW	    D'255'
+;	SUBWF	    ONLAR,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	MOVLW	    D'9'
+;	MOVWF	    ONLAR
+;	GOTO	    DONGU
+;	
+;	
+;	
+;	
+	
+	
+;5ER 5ER ?LER? SAYAN KOD	
+;KAT_5
+;	BCF	    STATUS,Z
+;	MOVLW	    D'5'
+;	SUBWF	    BIRLER,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    KAT_0
+;	GOTO	    DONGU
+;	
+;KAT_0
+;	BCF	    STATUS,Z
+;	MOVLW	    D'0'
+;	SUBWF	    BIRLER,W
+;	BTFSC	    STATUS,Z
+;	GOTO	    ON
+;	INCF	    BIRLER,1
+;	GOTO	    KAT_5
+;	
+;ON	
+;	INCF	    ONLAR,1
+;	GOTO	    DONGU
+;
+;DONGU
+;	BCF	    STATUS,Z
+;	MOVLW	    D'15'
+;	MOVWF	    DELAYY
+;	
+;	MOVLW	    D'10'
+;	SUBWF	    BIRLER,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;	
+;ISLEM1
+;	MOVLW	    B'00000010'
+;	MOVWF	    PORTC
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTC
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	DECFSZ	    DELAYY,1
+;	GOTO	    ISLEM1
+;	MOVLW	    D'5'
+;	ADDWF	    BIRLER,1
+;	GOTO	    DONGU
+;	
+;ISLEM2
+;	BCF	    STATUS,Z
+;	CLRF	    BIRLER
+;	INCF	    ONLAR,1
+;	MOVLW	    d'9'
+;	SUBWF	    ONLAR,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	CLRF	    ONLAR
+;	GOTO	    DONGU
+;	
+	
+	
+;5er5er ileri sayan kod	
+;KAT_5
+;	BCF	    STATUS,Z
+;	MOVLW	    D'5'
+;	SUBWF	    BIRLER,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    KAT_0
+;	GOTO	    DONGU
+;	
+;KAT_0
+;	BCF	    STATUS,Z
+;	MOVLW	    D'0'
+;	SUBWF	    BIRLER,W
+;	BTFSC	    STATUS,Z
+;	GOTO	    ON
+;	INCF	    BIRLER,1
+;	GOTO	    KAT_5
+;
+;ON
+;	INCF	    ONLAR,1
+;	GOTO	    DONGU
+;	
+;DONGU
+;	MOVLW	    D'10'
+;	MOVWF	    SAYAC
+;	BCF	    STATUS,Z
+;	MOVLW	    d'10'
+;	MOVWF	    DELAYY
+;	
+;	MOVF	    BIRLER,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;	
+;	
+;ISLEM1
+;	MOVLW	    B'00000010'
+;	MOVWF	    PORTC
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTC
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	DECFSZ	    DELAYY,1
+;	GOTO	    ISLEM1
+;	MOVLW	    D'5'
+;	ADDWF	    BIRLER,1
+;	GOTO	    DONGU
+;
+;ISLEM2
+;	INCF	    ONLAR,1
+;	MOVLW	    D'0'
+;	MOVWF	    BIRLER
+;	BCF	    STATUS,Z
+;	MOVLW	    D'10'
+;	SUBWF	    ONLAR,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	CLRF	    ONLAR
+;	GOTO	    DONGU
+;	
+	
+;8GER? SAYAN KOD
+;	MOVLW	    D'8'
+;	MOVWF	    ONLAR
+;
+;	MOVLW	    D'7'
+;	MOVWF	    BIRLER
+;	
+;KAT_5
+;	
+;	BCF	    STATUS,Z
+;	MOVLW	    D'5'
+;	SUBWF	    BIRLER,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    KAT_0
+;	GOTO	    DONGU
+;KAT_0
+;	BCF	    STATUS,Z
+;	MOVLW	    D'0'
+;	SUBWF	    BIRLER,W
+;	BTFSC	    STATUS,Z
+;	GOTO	    DONGU
+;	DECF	    BIRLER,1
+;	GOTO	    KAT_5
+;	
+;	
+;DONGU
+;	MOVLW	    D'251'
+;	MOVWF	    SAYAC
+;	BCF	    STATUS,Z
+;	MOVLW	    D'10'
+;	MOVWF	    DELAYY
+;	
+;	MOVF	    BIRLER,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;	
+;ISLEM1
+;	MOVLW	    b'00000010'
+;	MOVWF	    PORTC
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTC
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	DECFSZ	    DELAYY,1
+;	GOTO	    ISLEM1
+;	MOVLW	    D'5'
+;	SUBWF	    BIRLER,1
+;;	DECF	    BIRLER,1
+;	GOTO	    DONGU
+;	
+;ISLEM2
+;	MOVLW	    D'255'
+;	MOVWF	    SAYAC2
+;	DECF	    ONLAR,1
+;	MOVLW	    D'5'
+;	MOVWF	    BIRLER
+;	BCF	    STATUS,Z
+;	MOVF	    ONLAR,W
+;	SUBWF	    SAYAC2,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	MOVLW	    D'9'
+;	MOVWF	    ONLAR
+;	GOTO	    KAT_5
+;	
+;DONGU
+;	MOVLW	    D'10'
+;	MOVWF	    SAYAC
+;	BCF	    STATUS,Z
+;	MOVLW	    D'8'
+;	MOVWF	    DELAYY
+;	
+;	MOVF	    BIRLER,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;	
+;ISLEM1
+;	MOVLW	    B'00000010'
+;	MOVWF	    PORTC
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTC
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	DECFSZ	    DELAYY,1
+;	GOTO	    ISLEM1
+;	MOVLW	    D'5'
+;	ADDWF	    BIRLER,1
+;	;INCF	    BIRLER,1
+;	GOTO	    DONGU
+;	
+;ISLEM2
+;	
+;	CLRF	    BIRLER
+;	INCF	    ONLAR,1
+;	BCF	    STATUS,Z
+;	MOVF	    ONLAR,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	CLRF	    ONLAR
+;	GOTO	    DONGU
+;	
+;	
+;	
+	
+	
+	
+
+;ARTIRMA
+;	CLRF	    BIRLER
+;	CLRF	    ONLAR
+;BUTTON
+;	BTFSS	    PORTA,2
+;	GOTO	    BUTTON
+;	GOTO	    DONGU
+;DONGU
+;	MOVLW	    D'10'
+;	MOVWF	    SAYAC
+;	BCF	    STATUS,Z
+;	MOVLW	    D'20'
+;	MOVWF	    DELAY
+;	
+;	MOVF	    BIRLER,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;	
+;ISLEM1
+;	MOVLW	    B'00000010'
+;	MOVWF	    PORTA
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTA
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	DECFSZ	    DELAY,1
+;	GOTO	    ISLEM1
+;;	MOVLW	    d'2'
+;;	ADDWF	    BIRLER,1
+;	INCF	    BIRLER,1
+;	GOTO	    DONGU
+;	
+;ISLEM2
+;	CLRF	    BIRLER
+;	INCF	    ONLAR,1
+;	MOVF	    ONLAR,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	CLRF	    ONLAR
+;	GOTO	    BUTTON
+;;	
+		
+	
+;;AZALTMA
+;	MOVLW	    D'9'
+;	MOVWF	    BIRLER
+;	MOVLW	    D'9'
+;	MOVWF	    ONLAR
+;	
+;BUTTON
+;	BTFSS	PORTA,2
+;	GOTO	BUTTON
+;	GOTO	DONGU
+;DONGU
+;	MOVLW	    D'255'
+;	MOVWF	    SAYAC
+;	BCF	    STATUS,Z
+;	MOVLW	    D'10'
+;	MOVWF	    DELAY
+;	
+;	MOVF	    BIRLER,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    ISLEM1
+;	GOTO	    ISLEM2
+;
+;ISLEM1
+;	MOVLW	    B'00000010'
+;	MOVWF	    PORTA
+;	MOVF	    BIRLER,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	
+;	MOVLW	    B'00000001'
+;	MOVWF	    PORTA
+;	MOVF	    ONLAR,W
+;	CALL	    LOOK_UP
+;	MOVWF	    PORTB
+;	CALL	    GECIKME
+;	DECFSZ	    DELAY,1
+;	GOTO	    ISLEM1
+;;	MOVLW	    D'5'
+;;	SUBWF	    BIRLER,1
+;	DECF	    BIRLER,1
+;	GOTO	    DONGU
+;	
+;ISLEM2
+;	DECF	    ONLAR,1
+;	MOVLW	    D'9'
+;	MOVWF	    BIRLER
+;	
+;	MOVLW	    D'255'
+;	MOVWF	    SAYAC
+;	BCF	    STATUS,Z
+;	MOVF	    ONLAR,W
+;	SUBWF	    SAYAC,W
+;	BTFSS	    STATUS,Z
+;	GOTO	    DONGU
+;	
+;	MOVLW	    D'9'
+;	MOVWF	    ONLAR
+;	GOTO	    BUTTON
+	
+
+	END
+
+
+
+
+

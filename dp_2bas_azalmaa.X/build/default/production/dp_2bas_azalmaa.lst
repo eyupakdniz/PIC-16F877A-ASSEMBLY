@@ -1,0 +1,1136 @@
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001         list            p=16f877A       
+                      00002         #include        <p16f877A.inc>  
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Mar 17 2019
+                      00005 ;  MPASM PIC16F877A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2019 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00567         LIST
+                      00003         
+2007   3F31           00004         __CONFIG    H'3F31'
+                      00005 
+                      00006 ;KULLANILACAK DEGISKENLER
+  00000020            00007 G1      EQU 0x20
+  00000021            00008 G2      EQU 0x21
+  00000022            00009 DELAYY  EQU 0x22
+  00000023            00010 BIRLER  EQU 0x23
+  00000024            00011 ONLAR   EQU 0x24
+  00000025            00012 SAYAC   EQU 0x25
+  00000026            00013 SAYAC2  EQU 0x26        
+                      00014 ;***** Kesme durumunda kaydedilmesi gereken SFR ler icin kullanilacak yardimci degiskenler
+                      00015                                 
+  0000007D            00016 w_temp          EQU     0x7D            
+  0000007E            00017 status_temp     EQU     0x7E            
+  0000007F            00018 pclath_temp     EQU     0x7F
+                      00019 ;********************************************************************************************
+                      00020         ORG     0x00                     
+                      00021 
+0000   0000           00022         NOP                             
+0001   2???           00023         GOTO    BASLA                    
+                      00024 
+                      00025         
+                      00026 ;**********************************************************************************************
+                      00027         ORG     0x04                    
+                      00028 
+                      00029 ;***********************************************************************************************
+0004                  00030 LOOK_UP
+0004   0782           00031         ADDWF       PCL,1
+0005   343F           00032         RETLW       0x3F
+0006   3406           00033         RETLW       0x06
+0007   345B           00034         RETLW       0x5B
+0008   344F           00035         RETLW       0x4F
+0009   3466           00036         RETLW       0x66
+000A   346D           00037         RETLW       0x6D
+000B   347D           00038         RETLW       0x7D
+000C   3407           00039         RETLW       0x07
+000D   347F           00040         RETLW       0x7F
+000E   346F           00041         RETLW       0x6F
+                      00042 ;***********************************************************************************************
+000F                  00043 GECIKME 
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000F   300D           00044         MOVLW       0x0D
+0010   00A0           00045         MOVWF       G1
+                      00046         
+0011   30FF           00047         MOVLW       0xFF
+0012   00A1           00048         MOVWF       G2
+0013                  00049 LOOP
+0013   0BA1           00050         DECFSZ      G2,1
+0014   2???           00051         GOTO        LOOP
+                      00052         
+0015   0BA0           00053         DECFSZ      G1,1
+0016   2???           00054         GOTO        LOOP
+                      00055         
+0017   0008           00056         RETURN
+                      00057         
+0018                  00058 BASLA
+0018   1683 1303      00059         BANKSEL     ADCON1
+001A   3006           00060         MOVLW       0x06
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001B   009F           00061         MOVWF       ADCON1
+                      00062         
+001C   1683 1303      00063         BANKSEL     TRISA
+001E   3008           00064         MOVLW       B'00001000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001F   0085           00065         MOVWF       TRISA
+                      00066         
+0020   1283 1303      00067         BANKSEL     PORTA
+0022   0185           00068         CLRF        PORTA
+0023   1683 1303      00069         BANKSEL     TRISB
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0025   0186           00070         CLRF        TRISB
+                      00071         
+0026   1283 1303      00072         BANKSEL     PORTB
+0028   0186           00073         CLRF        PORTB
+                      00074         
+0029   1683 1303      00075         BANKSEL     TRISC
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002B   0187           00076         CLRF        TRISC
+                      00077         
+002C   1283 1303      00078         BANKSEL     PORTC
+002E   0187           00079         CLRF        PORTC
+                      00080 
+002F   01A4           00081         CLRF        ONLAR
+0030   01A3           00082         CLRF        BIRLER
+                      00083 
+0031                  00084 BUTTON
+0031   1D85           00085         BTFSS       PORTA,3
+0032   2???           00086         GOTO        BUTTON
+0033   2???           00087         GOTO        DONGU
+                      00088         
+0034                  00089 DONGU
+0034   1103           00090         BCF         STATUS,Z
+0035   300A           00091         MOVLW       D'10'
+0036   00A2           00092         MOVWF       DELAYY
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00093         
+0037   300A           00094         MOVLW       D'10'
+0038   0223           00095         SUBWF       BIRLER,W
+0039   1D03           00096         BTFSS       STATUS,Z
+003A   2???           00097         GOTO        ISLEM1
+003B   2???           00098         GOTO        ISLEM2
+                      00099         
+003C                  00100 ISLEM1
+003C   3002           00101         MOVLW       B'00000010'
+003D   0087           00102         MOVWF       PORTC
+003E   0823           00103         MOVF        BIRLER,W
+003F   2???           00104         CALL        LOOK_UP
+0040   0086           00105         MOVWF       PORTB
+0041   2???           00106         CALL        GECIKME
+                      00107         
+0042   3001           00108         MOVLW       B'00000001'
+0043   0087           00109         MOVWF       PORTC
+0044   0824           00110         MOVF        ONLAR,W
+0045   2???           00111         CALL        LOOK_UP
+0046   0086           00112         MOVWF       PORTB
+0047   2???           00113         CALL        GECIKME
+0048   0BA2           00114         DECFSZ      DELAYY,1
+0049   2???           00115         GOTO        ISLEM1
+004A   3002           00116         MOVLW       D'2'
+004B   07A3           00117         ADDWF       BIRLER,1
+004C   2???           00118         GOTO        BUTTON
+                      00119                 
+004D                  00120 ISLEM2
+004D   01A3           00121         CLRF        BIRLER
+004E   0AA4           00122         INCF        ONLAR,1
+004F   300A           00123         MOVLW       D'10'
+0050   0224           00124         SUBWF       ONLAR,W
+0051   1D03           00125         BTFSS       STATUS,Z
+0052   2???           00126         GOTO        BUTTON
+0053   01A4           00127         CLRF        ONLAR
+0054   2???           00128         GOTO        BUTTON
+                      00129         
+                      00130         
+                      00131         
+                      00132 ;BUTTON
+                      00133 ;       BTFSS       PORTA,3
+                      00134 ;       GOTO        BUTTON
+                      00135 ;       GOTO        DONGU
+                      00136 ;       
+                      00137 ;DONGU
+                      00138 ;       BCF         STATUS,Z
+                      00139 ;       MOVLW       D'10'
+                      00140 ;       MOVWF       DELAYY
+                      00141 ;       
+                      00142 ;       MOVLW       D'10'
+                      00143 ;       SUBWF       BIRLER,W
+                      00144 ;       BTFSS       STATUS,Z
+                      00145 ;       GOTO        ISLEM1
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00146 ;       GOTO        ISLEM2
+                      00147 ;       
+                      00148 ;ISLEM1
+                      00149 ;       MOVLW       B'00000010'
+                      00150 ;       MOVWF       PORTC
+                      00151 ;       MOVF        BIRLER,W
+                      00152 ;       CALL        LOOK_UP
+                      00153 ;       MOVWF       PORTB
+                      00154 ;       CALL        GECIKME
+                      00155 ;       
+                      00156 ;       MOVLW       B'00000001'
+                      00157 ;       MOVWF       PORTC
+                      00158 ;       MOVF        ONLAR,W
+                      00159 ;       CALL        LOOK_UP
+                      00160 ;       MOVWF       PORTB
+                      00161 ;       CALL        GECIKME
+                      00162 ;       DECFSZ      DELAYY,1
+                      00163 ;       GOTO        ISLEM1
+                      00164 ;       MOVLW       D'2'
+                      00165 ;       ADDWF       BIRLER,1
+                      00166 ;       GOTO        DONGU
+                      00167 ;       
+                      00168 ;
+                      00169 ;       
+                      00170 ;ISLEM2
+                      00171 ;       CLRF        BIRLER
+                      00172 ;       INCF        ONLAR,1
+                      00173 ;       MOVLW       D'10'
+                      00174 ;       SUBWF       ONLAR,W
+                      00175 ;       BTFSS       STATUS,Z
+                      00176 ;       GOTO        DONGU
+                      00177 ;       CLRF        ONLAR
+                      00178 ;       GOTO        DONGU
+                      00179 
+                      00180 ;;5 5 AZALTMA   
+                      00181 ;       MOVLW       D'8'
+                      00182 ;       MOVWF       BIRLER
+                      00183 ;       
+                      00184 ;       MOVLW       D'2'
+                      00185 ;       MOVWF       ONLAR
+                      00186 
+                      00187 ;KAT_5
+                      00188 ;       BCF         STATUS,Z
+                      00189 ;       MOVLW       D'5'
+                      00190 ;       SUBWF       BIRLER,W
+                      00191 ;       BTFSS       STATUS,Z
+                      00192 ;       GOTO        KAT_0
+                      00193 ;       GOTO        DONGU
+                      00194 ;       
+                      00195 ;KAT_0
+                      00196 ;       BCF         STATUS,Z
+                      00197 ;       MOVLW       D'0'
+                      00198 ;       SUBWF       BIRLER,W
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00199 ;       BTFSC       STATUS,Z
+                      00200 ;       GOTO        DONGU
+                      00201 ;       DECF        BIRLER,1
+                      00202 ;       GOTO        KAT_5
+                      00203 ;       
+                      00204 ;DONGU
+                      00205 ;       BCF         STATUS,Z
+                      00206 ;       MOVLW       D'10'
+                      00207 ;       MOVWF       DELAYY
+                      00208 ;       
+                      00209 ;       MOVLW       D'251'
+                      00210 ;       SUBWF       BIRLER,W
+                      00211 ;       BTFSS       STATUS,Z
+                      00212 ;       GOTO        ISLEM1
+                      00213 ;       GOTO        ISLEM2
+                      00214 ;       
+                      00215 ;ISLEM1
+                      00216 ;       MOVLW       B'00000010'
+                      00217 ;       MOVWF       PORTC
+                      00218 ;       MOVF        BIRLER,W
+                      00219 ;       CALL        LOOK_UP
+                      00220 ;       MOVWF       PORTB
+                      00221 ;       CALL        GECIKME
+                      00222 ;       
+                      00223 ;       MOVLW       B'00000001'
+                      00224 ;       MOVWF       PORTC
+                      00225 ;       MOVF        ONLAR,W
+                      00226 ;       CALL        LOOK_UP
+                      00227 ;       MOVWF       PORTB
+                      00228 ;       CALL        GECIKME
+                      00229 ;       
+                      00230 ;       DECFSZ      DELAYY,1
+                      00231 ;       GOTO        ISLEM1
+                      00232 ;       MOVLW       D'5'
+                      00233 ;       SUBWF       BIRLER,1
+                      00234 ;       GOTO        DONGU
+                      00235 ;       
+                      00236 ;ISLEM2
+                      00237 ;       BCF         STATUS,Z
+                      00238 ;       MOVLW       D'5'
+                      00239 ;       MOVWF       BIRLER
+                      00240 ;       DECF        ONLAR,1
+                      00241 ;       MOVLW       D'255'
+                      00242 ;       SUBWF       ONLAR,W
+                      00243 ;       BTFSS       STATUS,Z
+                      00244 ;       GOTO        DONGU
+                      00245 ;       MOVLW       D'9'
+                      00246 ;       MOVWF       ONLAR
+                      00247 ;       GOTO        DONGU
+                      00248 ;       
+                      00249 ;       
+                      00250 ;       
+                      00251 ;       
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00252         
+                      00253         
+                      00254 ;5ER 5ER ?LER? SAYAN KOD        
+                      00255 ;KAT_5
+                      00256 ;       BCF         STATUS,Z
+                      00257 ;       MOVLW       D'5'
+                      00258 ;       SUBWF       BIRLER,W
+                      00259 ;       BTFSS       STATUS,Z
+                      00260 ;       GOTO        KAT_0
+                      00261 ;       GOTO        DONGU
+                      00262 ;       
+                      00263 ;KAT_0
+                      00264 ;       BCF         STATUS,Z
+                      00265 ;       MOVLW       D'0'
+                      00266 ;       SUBWF       BIRLER,W
+                      00267 ;       BTFSC       STATUS,Z
+                      00268 ;       GOTO        ON
+                      00269 ;       INCF        BIRLER,1
+                      00270 ;       GOTO        KAT_5
+                      00271 ;       
+                      00272 ;ON     
+                      00273 ;       INCF        ONLAR,1
+                      00274 ;       GOTO        DONGU
+                      00275 ;
+                      00276 ;DONGU
+                      00277 ;       BCF         STATUS,Z
+                      00278 ;       MOVLW       D'15'
+                      00279 ;       MOVWF       DELAYY
+                      00280 ;       
+                      00281 ;       MOVLW       D'10'
+                      00282 ;       SUBWF       BIRLER,W
+                      00283 ;       BTFSS       STATUS,Z
+                      00284 ;       GOTO        ISLEM1
+                      00285 ;       GOTO        ISLEM2
+                      00286 ;       
+                      00287 ;ISLEM1
+                      00288 ;       MOVLW       B'00000010'
+                      00289 ;       MOVWF       PORTC
+                      00290 ;       MOVF        BIRLER,W
+                      00291 ;       CALL        LOOK_UP
+                      00292 ;       MOVWF       PORTB
+                      00293 ;       CALL        GECIKME
+                      00294 ;       
+                      00295 ;       MOVLW       B'00000001'
+                      00296 ;       MOVWF       PORTC
+                      00297 ;       MOVF        ONLAR,W
+                      00298 ;       CALL        LOOK_UP
+                      00299 ;       MOVWF       PORTB
+                      00300 ;       CALL        GECIKME
+                      00301 ;       
+                      00302 ;       DECFSZ      DELAYY,1
+                      00303 ;       GOTO        ISLEM1
+                      00304 ;       MOVLW       D'5'
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00305 ;       ADDWF       BIRLER,1
+                      00306 ;       GOTO        DONGU
+                      00307 ;       
+                      00308 ;ISLEM2
+                      00309 ;       BCF         STATUS,Z
+                      00310 ;       CLRF        BIRLER
+                      00311 ;       INCF        ONLAR,1
+                      00312 ;       MOVLW       d'9'
+                      00313 ;       SUBWF       ONLAR,W
+                      00314 ;       BTFSS       STATUS,Z
+                      00315 ;       GOTO        DONGU
+                      00316 ;       CLRF        ONLAR
+                      00317 ;       GOTO        DONGU
+                      00318 ;       
+                      00319         
+                      00320         
+                      00321 ;5er5er ileri sayan kod 
+                      00322 ;KAT_5
+                      00323 ;       BCF         STATUS,Z
+                      00324 ;       MOVLW       D'5'
+                      00325 ;       SUBWF       BIRLER,W
+                      00326 ;       BTFSS       STATUS,Z
+                      00327 ;       GOTO        KAT_0
+                      00328 ;       GOTO        DONGU
+                      00329 ;       
+                      00330 ;KAT_0
+                      00331 ;       BCF         STATUS,Z
+                      00332 ;       MOVLW       D'0'
+                      00333 ;       SUBWF       BIRLER,W
+                      00334 ;       BTFSC       STATUS,Z
+                      00335 ;       GOTO        ON
+                      00336 ;       INCF        BIRLER,1
+                      00337 ;       GOTO        KAT_5
+                      00338 ;
+                      00339 ;ON
+                      00340 ;       INCF        ONLAR,1
+                      00341 ;       GOTO        DONGU
+                      00342 ;       
+                      00343 ;DONGU
+                      00344 ;       MOVLW       D'10'
+                      00345 ;       MOVWF       SAYAC
+                      00346 ;       BCF         STATUS,Z
+                      00347 ;       MOVLW       d'10'
+                      00348 ;       MOVWF       DELAYY
+                      00349 ;       
+                      00350 ;       MOVF        BIRLER,W
+                      00351 ;       SUBWF       SAYAC,W
+                      00352 ;       BTFSS       STATUS,Z
+                      00353 ;       GOTO        ISLEM1
+                      00354 ;       GOTO        ISLEM2
+                      00355 ;       
+                      00356 ;       
+                      00357 ;ISLEM1
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00358 ;       MOVLW       B'00000010'
+                      00359 ;       MOVWF       PORTC
+                      00360 ;       MOVF        BIRLER,W
+                      00361 ;       CALL        LOOK_UP
+                      00362 ;       MOVWF       PORTB
+                      00363 ;       CALL        GECIKME
+                      00364 ;       
+                      00365 ;       MOVLW       B'00000001'
+                      00366 ;       MOVWF       PORTC
+                      00367 ;       MOVF        ONLAR,W
+                      00368 ;       CALL        LOOK_UP
+                      00369 ;       MOVWF       PORTB
+                      00370 ;       CALL        GECIKME
+                      00371 ;       DECFSZ      DELAYY,1
+                      00372 ;       GOTO        ISLEM1
+                      00373 ;       MOVLW       D'5'
+                      00374 ;       ADDWF       BIRLER,1
+                      00375 ;       GOTO        DONGU
+                      00376 ;
+                      00377 ;ISLEM2
+                      00378 ;       INCF        ONLAR,1
+                      00379 ;       MOVLW       D'0'
+                      00380 ;       MOVWF       BIRLER
+                      00381 ;       BCF         STATUS,Z
+                      00382 ;       MOVLW       D'10'
+                      00383 ;       SUBWF       ONLAR,W
+                      00384 ;       BTFSS       STATUS,Z
+                      00385 ;       GOTO        DONGU
+                      00386 ;       CLRF        ONLAR
+                      00387 ;       GOTO        DONGU
+                      00388 ;       
+                      00389         
+                      00390 ;8GER? SAYAN KOD
+                      00391 ;       MOVLW       D'8'
+                      00392 ;       MOVWF       ONLAR
+                      00393 ;
+                      00394 ;       MOVLW       D'7'
+                      00395 ;       MOVWF       BIRLER
+                      00396 ;       
+                      00397 ;KAT_5
+                      00398 ;       
+                      00399 ;       BCF         STATUS,Z
+                      00400 ;       MOVLW       D'5'
+                      00401 ;       SUBWF       BIRLER,W
+                      00402 ;       BTFSS       STATUS,Z
+                      00403 ;       GOTO        KAT_0
+                      00404 ;       GOTO        DONGU
+                      00405 ;KAT_0
+                      00406 ;       BCF         STATUS,Z
+                      00407 ;       MOVLW       D'0'
+                      00408 ;       SUBWF       BIRLER,W
+                      00409 ;       BTFSC       STATUS,Z
+                      00410 ;       GOTO        DONGU
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00411 ;       DECF        BIRLER,1
+                      00412 ;       GOTO        KAT_5
+                      00413 ;       
+                      00414 ;       
+                      00415 ;DONGU
+                      00416 ;       MOVLW       D'251'
+                      00417 ;       MOVWF       SAYAC
+                      00418 ;       BCF         STATUS,Z
+                      00419 ;       MOVLW       D'10'
+                      00420 ;       MOVWF       DELAYY
+                      00421 ;       
+                      00422 ;       MOVF        BIRLER,W
+                      00423 ;       SUBWF       SAYAC,W
+                      00424 ;       BTFSS       STATUS,Z
+                      00425 ;       GOTO        ISLEM1
+                      00426 ;       GOTO        ISLEM2
+                      00427 ;       
+                      00428 ;ISLEM1
+                      00429 ;       MOVLW       b'00000010'
+                      00430 ;       MOVWF       PORTC
+                      00431 ;       MOVF        BIRLER,W
+                      00432 ;       CALL        LOOK_UP
+                      00433 ;       MOVWF       PORTB
+                      00434 ;       CALL        GECIKME
+                      00435 ;       
+                      00436 ;       MOVLW       B'00000001'
+                      00437 ;       MOVWF       PORTC
+                      00438 ;       MOVF        ONLAR,W
+                      00439 ;       CALL        LOOK_UP
+                      00440 ;       MOVWF       PORTB
+                      00441 ;       CALL        GECIKME
+                      00442 ;       DECFSZ      DELAYY,1
+                      00443 ;       GOTO        ISLEM1
+                      00444 ;       MOVLW       D'5'
+                      00445 ;       SUBWF       BIRLER,1
+                      00446 ;;      DECF        BIRLER,1
+                      00447 ;       GOTO        DONGU
+                      00448 ;       
+                      00449 ;ISLEM2
+                      00450 ;       MOVLW       D'255'
+                      00451 ;       MOVWF       SAYAC2
+                      00452 ;       DECF        ONLAR,1
+                      00453 ;       MOVLW       D'5'
+                      00454 ;       MOVWF       BIRLER
+                      00455 ;       BCF         STATUS,Z
+                      00456 ;       MOVF        ONLAR,W
+                      00457 ;       SUBWF       SAYAC2,W
+                      00458 ;       BTFSS       STATUS,Z
+                      00459 ;       GOTO        DONGU
+                      00460 ;       MOVLW       D'9'
+                      00461 ;       MOVWF       ONLAR
+                      00462 ;       GOTO        KAT_5
+                      00463 ;       
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00464 ;DONGU
+                      00465 ;       MOVLW       D'10'
+                      00466 ;       MOVWF       SAYAC
+                      00467 ;       BCF         STATUS,Z
+                      00468 ;       MOVLW       D'8'
+                      00469 ;       MOVWF       DELAYY
+                      00470 ;       
+                      00471 ;       MOVF        BIRLER,W
+                      00472 ;       SUBWF       SAYAC,W
+                      00473 ;       BTFSS       STATUS,Z
+                      00474 ;       GOTO        ISLEM1
+                      00475 ;       GOTO        ISLEM2
+                      00476 ;       
+                      00477 ;ISLEM1
+                      00478 ;       MOVLW       B'00000010'
+                      00479 ;       MOVWF       PORTC
+                      00480 ;       MOVF        BIRLER,W
+                      00481 ;       CALL        LOOK_UP
+                      00482 ;       MOVWF       PORTB
+                      00483 ;       CALL        GECIKME
+                      00484 ;       
+                      00485 ;       MOVLW       B'00000001'
+                      00486 ;       MOVWF       PORTC
+                      00487 ;       MOVF        ONLAR,W
+                      00488 ;       CALL        LOOK_UP
+                      00489 ;       MOVWF       PORTB
+                      00490 ;       CALL        GECIKME
+                      00491 ;       
+                      00492 ;       DECFSZ      DELAYY,1
+                      00493 ;       GOTO        ISLEM1
+                      00494 ;       MOVLW       D'5'
+                      00495 ;       ADDWF       BIRLER,1
+                      00496 ;       ;INCF       BIRLER,1
+                      00497 ;       GOTO        DONGU
+                      00498 ;       
+                      00499 ;ISLEM2
+                      00500 ;       
+                      00501 ;       CLRF        BIRLER
+                      00502 ;       INCF        ONLAR,1
+                      00503 ;       BCF         STATUS,Z
+                      00504 ;       MOVF        ONLAR,W
+                      00505 ;       SUBWF       SAYAC,W
+                      00506 ;       BTFSS       STATUS,Z
+                      00507 ;       GOTO        DONGU
+                      00508 ;       CLRF        ONLAR
+                      00509 ;       GOTO        DONGU
+                      00510 ;       
+                      00511 ;       
+                      00512 ;       
+                      00513         
+                      00514         
+                      00515         
+                      00516 
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00517 ;ARTIRMA
+                      00518 ;       CLRF        BIRLER
+                      00519 ;       CLRF        ONLAR
+                      00520 ;BUTTON
+                      00521 ;       BTFSS       PORTA,2
+                      00522 ;       GOTO        BUTTON
+                      00523 ;       GOTO        DONGU
+                      00524 ;DONGU
+                      00525 ;       MOVLW       D'10'
+                      00526 ;       MOVWF       SAYAC
+                      00527 ;       BCF         STATUS,Z
+                      00528 ;       MOVLW       D'20'
+                      00529 ;       MOVWF       DELAY
+                      00530 ;       
+                      00531 ;       MOVF        BIRLER,W
+                      00532 ;       SUBWF       SAYAC,W
+                      00533 ;       BTFSS       STATUS,Z
+                      00534 ;       GOTO        ISLEM1
+                      00535 ;       GOTO        ISLEM2
+                      00536 ;       
+                      00537 ;ISLEM1
+                      00538 ;       MOVLW       B'00000010'
+                      00539 ;       MOVWF       PORTA
+                      00540 ;       MOVF        BIRLER,W
+                      00541 ;       CALL        LOOK_UP
+                      00542 ;       MOVWF       PORTB
+                      00543 ;       CALL        GECIKME
+                      00544 ;       
+                      00545 ;       MOVLW       B'00000001'
+                      00546 ;       MOVWF       PORTA
+                      00547 ;       MOVF        ONLAR,W
+                      00548 ;       CALL        LOOK_UP
+                      00549 ;       MOVWF       PORTB
+                      00550 ;       CALL        GECIKME
+                      00551 ;       DECFSZ      DELAY,1
+                      00552 ;       GOTO        ISLEM1
+                      00553 ;;      MOVLW       d'2'
+                      00554 ;;      ADDWF       BIRLER,1
+                      00555 ;       INCF        BIRLER,1
+                      00556 ;       GOTO        DONGU
+                      00557 ;       
+                      00558 ;ISLEM2
+                      00559 ;       CLRF        BIRLER
+                      00560 ;       INCF        ONLAR,1
+                      00561 ;       MOVF        ONLAR,W
+                      00562 ;       SUBWF       SAYAC,W
+                      00563 ;       BTFSS       STATUS,Z
+                      00564 ;       GOTO        DONGU
+                      00565 ;       CLRF        ONLAR
+                      00566 ;       GOTO        BUTTON
+                      00567 ;;      
+                      00568                 
+                      00569         
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00570 ;;AZALTMA
+                      00571 ;       MOVLW       D'9'
+                      00572 ;       MOVWF       BIRLER
+                      00573 ;       MOVLW       D'9'
+                      00574 ;       MOVWF       ONLAR
+                      00575 ;       
+                      00576 ;BUTTON
+                      00577 ;       BTFSS   PORTA,2
+                      00578 ;       GOTO    BUTTON
+                      00579 ;       GOTO    DONGU
+                      00580 ;DONGU
+                      00581 ;       MOVLW       D'255'
+                      00582 ;       MOVWF       SAYAC
+                      00583 ;       BCF         STATUS,Z
+                      00584 ;       MOVLW       D'10'
+                      00585 ;       MOVWF       DELAY
+                      00586 ;       
+                      00587 ;       MOVF        BIRLER,W
+                      00588 ;       SUBWF       SAYAC,W
+                      00589 ;       BTFSS       STATUS,Z
+                      00590 ;       GOTO        ISLEM1
+                      00591 ;       GOTO        ISLEM2
+                      00592 ;
+                      00593 ;ISLEM1
+                      00594 ;       MOVLW       B'00000010'
+                      00595 ;       MOVWF       PORTA
+                      00596 ;       MOVF        BIRLER,W
+                      00597 ;       CALL        LOOK_UP
+                      00598 ;       MOVWF       PORTB
+                      00599 ;       CALL        GECIKME
+                      00600 ;       
+                      00601 ;       MOVLW       B'00000001'
+                      00602 ;       MOVWF       PORTA
+                      00603 ;       MOVF        ONLAR,W
+                      00604 ;       CALL        LOOK_UP
+                      00605 ;       MOVWF       PORTB
+                      00606 ;       CALL        GECIKME
+                      00607 ;       DECFSZ      DELAY,1
+                      00608 ;       GOTO        ISLEM1
+                      00609 ;;      MOVLW       D'5'
+                      00610 ;;      SUBWF       BIRLER,1
+                      00611 ;       DECF        BIRLER,1
+                      00612 ;       GOTO        DONGU
+                      00613 ;       
+                      00614 ;ISLEM2
+                      00615 ;       DECF        ONLAR,1
+                      00616 ;       MOVLW       D'9'
+                      00617 ;       MOVWF       BIRLER
+                      00618 ;       
+                      00619 ;       MOVLW       D'255'
+                      00620 ;       MOVWF       SAYAC
+                      00621 ;       BCF         STATUS,Z
+                      00622 ;       MOVF        ONLAR,W
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00623 ;       SUBWF       SAYAC,W
+                      00624 ;       BTFSS       STATUS,Z
+                      00625 ;       GOTO        DONGU
+                      00626 ;       
+                      00627 ;       MOVLW       D'9'
+                      00628 ;       MOVWF       ONLAR
+                      00629 ;       GOTO        BUTTON
+                      00630         
+                      00631 
+3F31                  00632         END
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+BASLA                             00000018
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BIRLER                            00000023
+BRGH                              00000002
+BUTTON                            00000031
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CHS2                              00000005
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DELAYY                            00000022
+DONGU                             00000034
+D_A                               00000005
+D_NOT_A                           00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+G1                                00000020
+G2                                00000021
+GCEN                              00000007
+GECIKME                           0000000F
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+ISLEM1                            0000003C
+ISLEM2                            0000004D
+LOOK_UP                           00000004
+LOOP                              00000013
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+ONLAR                             00000024
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+PSPIF                             00000007
+PSPMODE                           00000004
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+SAYAC                             00000025
+SAYAC2                            00000026
+SEN                               00000000
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+W                                 00000000
+MPASM 5.84               DP_2BAS_AZALMAA.ASM   11-9-2021  12:23:17         PAGE 20
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+pclath_temp                       0000007F
+status_temp                       0000007E
+w_temp                            0000007D
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     4 reported,     0 suppressed
+
+

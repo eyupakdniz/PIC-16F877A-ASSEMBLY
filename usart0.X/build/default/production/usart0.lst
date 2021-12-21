@@ -1,0 +1,1468 @@
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001         ;
+                      00002 
+                      00003     
+                      00004     
+                      00005     ;   ;9 DAN 0 kadar geriye ekranda yazan kod
+                      00006 ;       list            p=16f877A       
+                      00007 ;       #include        <p16f877A.inc>  
+                      00008 ;       
+                      00009 ;       __CONFIG H'3F31'
+                      00010 ;G1     EQU 0x20
+                      00011 ;G2     EQU 0x21
+                      00012 ;G3     EQU 0x22
+                      00013 ;SAYAC  EQU 0x23
+                      00014 ;SAYI_L EQU 0x24
+                      00015 ;SAYI_H EQU 0x25
+                      00016 ;TEMP_L EQU 0x26
+                      00017 ;BINLER EQU 0x27
+                      00018 ;YUZLER EQU 0x28
+                      00019 ;ONLAR  EQU 0x29
+                      00020 ;BIRLER EQU 0x30
+                      00021 ;SAYI_1 EQU 0x31
+                      00022 ;SAYI_2 EQU 0x32
+                      00023 ;;*******************************
+                      00024 ;       ORG 0x000
+                      00025 ;       NOP
+                      00026 ;       GOTO    BAS
+                      00027 ;;***************************
+                      00028 ;       ORG 0x004
+                      00029 ;       RETFIE
+                      00030 ;;***************************
+                      00031 ;ASCII_LOOKUP
+                      00032 ;       ADDWF   PCL,1
+                      00033 ;       RETLW   0x30
+                      00034 ;       RETLW   0x31
+                      00035 ;       RETLW   0x32
+                      00036 ;       RETLW   0x33
+                      00037 ;       RETLW   0x34
+                      00038 ;       RETLW   0x35
+                      00039 ;       RETLW   0x36
+                      00040 ;       RETLW   0x37
+                      00041 ;       RETLW   0x38
+                      00042 ;       RETLW   0x39
+                      00043 ;;;*************************************
+                      00044 ;GECIKME
+                      00045 ;;      MOVLW   0x01
+                      00046 ;;      MOVWF   G1
+                      00047 ;       MOVLW   0x50
+                      00048 ;       MOVWF   G2
+                      00049 ;       MOVLW   0xFF
+                      00050 ;       MOVWF   G3
+                      00051 ;       
+                      00052 ;LOOP
+                      00053 ;       DECFSZ  G3,1
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00054 ;       GOTO    LOOP
+                      00055 ;       DECFSZ  G2,1
+                      00056 ;       GOTO    LOOP
+                      00057 ;;      DECFSZ  G1,1
+                      00058 ;;      GOTO    LOOP
+                      00059 ;       RETURN
+                      00060 ;;***************************
+                      00061 ;USART_AYAR
+                      00062 ;       BANKSEL TRISC
+                      00063 ;       MOVLW   B'10000000'
+                      00064 ;       MOVWF   TRISC
+                      00065 ;       
+                      00066 ;       MOVLW   0x19
+                      00067 ;       MOVWF   SPBRG
+                      00068 ;       
+                      00069 ;       MOVLW   0x26
+                      00070 ;       MOVWF   TXSTA
+                      00071 ;       
+                      00072 ;       BANKSEL RCSTA
+                      00073 ;       MOVLW   0x90
+                      00074 ;       MOVWF   RCSTA
+                      00075 ;       RETURN  
+                      00076 ;;**************************
+                      00077 ;KESME_AYAR
+                      00078 ;       BANKSEL PIE1
+                      00079 ;       BCF     PIE1,TXIE
+                      00080 ;       
+                      00081 ;       BANKSEL INTCON
+                      00082 ;       BCF     INTCON,GIE
+                      00083 ;       RETURN
+                      00084 ;;************************
+                      00085 ;SERI_GONDER
+                      00086 ;       BTFSS   PIR1,TXIF
+                      00087 ;       GOTO    $-1
+                      00088 ;       
+                      00089 ;       BCF     PIR1,TXIF
+                      00090 ;       BANKSEL TXREG
+                      00091 ;       MOVWF   TXREG
+                      00092 ;       RETURN
+                      00093 ;;***************************** 
+                      00094 ;CEVIR
+                      00095 ;       MOVF    SAYI_H,1
+                      00096 ;       BTFSC   STATUS,Z
+                      00097 ;       GOTO    ATLA
+                      00098 ;       CALL    CEVIR_H
+                      00099 ;ATLA
+                      00100 ;       CALL    CEVIR_L
+                      00101 ;       RETURN
+                      00102 ;;****************************
+                      00103 ;CEVIR_H
+                      00104 ;       MOVF    SAYI_L,W
+                      00105 ;       MOVWF   TEMP_L
+                      00106 ;HH
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00107 ;       INCF    BIRLER,1
+                      00108 ;       MOVLW   0xFF
+                      00109 ;       MOVWF   SAYI_L
+                      00110 ;       CALL    CEVIR_L
+                      00111 ;       DECFSZ  SAYI_H,1
+                      00112 ;       GOTO    HH
+                      00113 ;       
+                      00114 ;       MOVF    TEMP_L,W
+                      00115 ;       MOVWF   SAYI_L
+                      00116 ;       RETURN
+                      00117 ;;****************************
+                      00118 ;CEVIR_L
+                      00119 ;       BCF     STATUS,Z
+                      00120 ;       MOVF    SAYI_L,1
+                      00121 ;       BTFSC   STATUS,Z
+                      00122 ;       RETURN
+                      00123 ;       
+                      00124 ;       BCF     STATUS,Z
+                      00125 ;       DECF    SAYI_L,1
+                      00126 ;       INCF    BIRLER,1
+                      00127 ;       MOVLW   0x0A
+                      00128 ;       SUBWF   BIRLER,0
+                      00129 ;       BTFSS   STATUS,Z
+                      00130 ;       GOTO    CEVIR_L
+                      00131 ;       
+                      00132 ;       BCF     STATUS,Z
+                      00133 ;       CLRF    BIRLER
+                      00134 ;       INCF    ONLAR,1
+                      00135 ;       MOVLW   0x0A
+                      00136 ;       SUBWF   ONLAR,0
+                      00137 ;       BTFSS   STATUS,Z
+                      00138 ;       GOTO    CEVIR_L
+                      00139 ;       
+                      00140 ;       BCF     STATUS,Z
+                      00141 ;       CLRF    ONLAR
+                      00142 ;       INCF    YUZLER,1
+                      00143 ;       MOVLW   0x0A
+                      00144 ;       SUBWF   YUZLER,0
+                      00145 ;       BTFSS   STATUS,Z
+                      00146 ;       GOTO    CEVIR_L
+                      00147 ;       
+                      00148 ;       BCF     STATUS,Z
+                      00149 ;       CLRF    YUZLER
+                      00150 ;       INCF    BINLER,1
+                      00151 ;       MOVLW   0x0A
+                      00152 ;       SUBWF   BINLER,0
+                      00153 ;       BTFSS   STATUS,Z
+                      00154 ;       GOTO    CEVIR_L
+                      00155 ;       RETURN
+                      00156 ;;******************************
+                      00157 ;ASCII_AYAR
+                      00158 ;       MOVF    BINLER,W
+                      00159 ;       CALL    ASCII_LOOKUP
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00160 ;       CALL    SERI_GONDER
+                      00161 ;       CALL    GECIKME
+                      00162 ;       
+                      00163 ;       MOVF    YUZLER,W
+                      00164 ;       CALL    ASCII_LOOKUP
+                      00165 ;       CALL    SERI_GONDER
+                      00166 ;       CALL    GECIKME
+                      00167 ;       
+                      00168 ;       MOVF    ONLAR,W
+                      00169 ;       CALL    ASCII_LOOKUP
+                      00170 ;       CALL    SERI_GONDER
+                      00171 ;       CALL    GECIKME
+                      00172 ;       
+                      00173 ;       MOVF    BIRLER,W
+                      00174 ;       CALL    ASCII_LOOKUP
+                      00175 ;       CALL    SERI_GONDER
+                      00176 ;       CALL    GECIKME
+                      00177 ;       RETURN
+                      00178 ;;*********************************
+                      00179 ;ISLEM
+                      00180 ;       MOVF    SAYI_1,W
+                      00181 ;;      MOVWF   SAYI_1
+                      00182 ;       CALL    ASCII_LOOKUP
+                      00183 ;       CALL    SERI_GONDER
+                      00184 ;       CALL    GECIKME
+                      00185 ;       DECF    SAYI_1,1
+                      00186 ;       MOVLW   0x2F
+                      00187 ;       SUBWF   SAYI_1,0
+                      00188 ;       BTFSS   STATUS,Z
+                      00189 ;       GOTO    ISLEM
+                      00190 ;       RETURN
+                      00191 ;;*****************************
+                      00192 ;BAS
+                      00193 ;       CALL    USART_AYAR
+                      00194 ;       CALL    KESME_AYAR
+                      00195 ;       MOVLW   0x0A
+                      00196 ;       MOVWF   SAYI_1
+                      00197 ;       CALL    ISLEM
+                      00198 ;       CALL    GECIKME
+                      00199 ;QQ
+                      00200 ;       GOTO    QQ
+                      00201 ;       END
+                      00202     
+                      00203     
+                      00204     ;;  ;2 BYTE LIK 2 sayinin toplami, sonuc 2 bytle olacak sekilde
+                      00205 ;       list            p=16f877A       
+                      00206 ;       #include        <p16f877A.inc>  
+                      00207 ;       
+                      00208 ;       __CONFIG H'3F31'
+                      00209 ;G1     EQU 0x20
+                      00210 ;G2     EQU 0x21
+                      00211 ;G3     EQU 0x22
+                      00212 ;SAYAC  EQU 0x23
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00213 ;SAYI_L EQU 0x24
+                      00214 ;SAYI_H EQU 0x25
+                      00215 ;TEMP_L EQU 0x26
+                      00216 ;BINLER EQU 0x27
+                      00217 ;YUZLER EQU 0x28
+                      00218 ;ONLAR  EQU 0x29
+                      00219 ;BIRLER EQU 0x30
+                      00220 ;SAYI_1 EQU 0x31
+                      00221 ;SAYI_2 EQU 0x32
+                      00222 ;;*******************************
+                      00223 ;       ORG 0x000
+                      00224 ;       NOP
+                      00225 ;       GOTO    BAS
+                      00226 ;;***************************
+                      00227 ;       ORG 0x004
+                      00228 ;       RETFIE
+                      00229 ;;***************************
+                      00230 ;ASCII_LOOKUP
+                      00231 ;       ADDWF   PCL,1
+                      00232 ;       RETLW   0x30
+                      00233 ;       RETLW   0x31
+                      00234 ;       RETLW   0x32
+                      00235 ;       RETLW   0x33
+                      00236 ;       RETLW   0x34
+                      00237 ;       RETLW   0x35
+                      00238 ;       RETLW   0x36
+                      00239 ;       RETLW   0x37
+                      00240 ;       RETLW   0x38
+                      00241 ;       RETLW   0x39
+                      00242 ;;;*************************************
+                      00243 ;GECIKME
+                      00244 ;;      MOVLW   0x01
+                      00245 ;;      MOVWF   G1
+                      00246 ;       MOVLW   0x50
+                      00247 ;       MOVWF   G2
+                      00248 ;       MOVLW   0xFF
+                      00249 ;       MOVWF   G3
+                      00250 ;       
+                      00251 ;LOOP
+                      00252 ;       DECFSZ  G3,1
+                      00253 ;       GOTO    LOOP
+                      00254 ;       DECFSZ  G2,1
+                      00255 ;       GOTO    LOOP
+                      00256 ;;      DECFSZ  G1,1
+                      00257 ;;      GOTO    LOOP
+                      00258 ;       RETURN
+                      00259 ;;***************************
+                      00260 ;USART_AYAR
+                      00261 ;       BANKSEL TRISC
+                      00262 ;       MOVLW   B'10000000'
+                      00263 ;       MOVWF   TRISC
+                      00264 ;       
+                      00265 ;       MOVLW   0x19
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00266 ;       MOVWF   SPBRG
+                      00267 ;       
+                      00268 ;       MOVLW   0x26
+                      00269 ;       MOVWF   TXSTA
+                      00270 ;       
+                      00271 ;       BANKSEL RCSTA
+                      00272 ;       MOVLW   0x90
+                      00273 ;       MOVWF   RCSTA
+                      00274 ;       RETURN  
+                      00275 ;;**************************
+                      00276 ;KESME_AYAR
+                      00277 ;       BANKSEL PIE1
+                      00278 ;       BCF     PIE1,TXIE
+                      00279 ;       
+                      00280 ;       BANKSEL INTCON
+                      00281 ;       BCF     INTCON,GIE
+                      00282 ;       RETURN
+                      00283 ;;************************
+                      00284 ;SERI_GONDER
+                      00285 ;       BTFSS   PIR1,TXIF
+                      00286 ;       GOTO    $-1
+                      00287 ;       
+                      00288 ;       BCF     PIR1,TXIF
+                      00289 ;       BANKSEL TXREG
+                      00290 ;       MOVWF   TXREG
+                      00291 ;       RETURN
+                      00292 ;;***************************** 
+                      00293 ;CEVIR
+                      00294 ;       MOVF    SAYI_H,1
+                      00295 ;       BTFSC   STATUS,Z
+                      00296 ;       GOTO    ATLA
+                      00297 ;       CALL    CEVIR_H
+                      00298 ;ATLA
+                      00299 ;       CALL    CEVIR_L
+                      00300 ;       RETURN
+                      00301 ;;****************************
+                      00302 ;CEVIR_H
+                      00303 ;       MOVF    SAYI_L,W
+                      00304 ;       MOVWF   TEMP_L
+                      00305 ;HH
+                      00306 ;       INCF    BIRLER,1
+                      00307 ;       MOVLW   0xFF
+                      00308 ;       MOVWF   SAYI_L
+                      00309 ;       CALL    CEVIR_L
+                      00310 ;       DECFSZ  SAYI_H,1
+                      00311 ;       GOTO    HH
+                      00312 ;       
+                      00313 ;       MOVF    TEMP_L,W
+                      00314 ;       MOVWF   SAYI_L
+                      00315 ;       RETURN
+                      00316 ;;****************************
+                      00317 ;CEVIR_L
+                      00318 ;       BCF     STATUS,Z
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00319 ;       MOVF    SAYI_L,1
+                      00320 ;       BTFSC   STATUS,Z
+                      00321 ;       RETURN
+                      00322 ;       
+                      00323 ;       BCF     STATUS,Z
+                      00324 ;       DECF    SAYI_L,1
+                      00325 ;       INCF    BIRLER,1
+                      00326 ;       MOVLW   0x0A
+                      00327 ;       SUBWF   BIRLER,0
+                      00328 ;       BTFSS   STATUS,Z
+                      00329 ;       GOTO    CEVIR_L
+                      00330 ;       
+                      00331 ;       BCF     STATUS,Z
+                      00332 ;       CLRF    BIRLER
+                      00333 ;       INCF    ONLAR,1
+                      00334 ;       MOVLW   0x0A
+                      00335 ;       SUBWF   ONLAR,0
+                      00336 ;       BTFSS   STATUS,Z
+                      00337 ;       GOTO    CEVIR_L
+                      00338 ;       
+                      00339 ;       BCF     STATUS,Z
+                      00340 ;       CLRF    ONLAR
+                      00341 ;       INCF    YUZLER,1
+                      00342 ;       MOVLW   0x0A
+                      00343 ;       SUBWF   YUZLER,0
+                      00344 ;       BTFSS   STATUS,Z
+                      00345 ;       GOTO    CEVIR_L
+                      00346 ;       
+                      00347 ;       BCF     STATUS,Z
+                      00348 ;       CLRF    YUZLER
+                      00349 ;       INCF    BINLER,1
+                      00350 ;       MOVLW   0x0A
+                      00351 ;       SUBWF   BINLER,0
+                      00352 ;       BTFSS   STATUS,Z
+                      00353 ;       GOTO    CEVIR_L
+                      00354 ;       RETURN
+                      00355 ;;******************************
+                      00356 ;ASCII_AYAR
+                      00357 ;       MOVF    BINLER,W
+                      00358 ;       CALL    ASCII_LOOKUP
+                      00359 ;       CALL    SERI_GONDER
+                      00360 ;       CALL    GECIKME
+                      00361 ;       
+                      00362 ;       MOVF    YUZLER,W
+                      00363 ;       CALL    ASCII_LOOKUP
+                      00364 ;       CALL    SERI_GONDER
+                      00365 ;       CALL    GECIKME
+                      00366 ;       
+                      00367 ;       MOVF    ONLAR,W
+                      00368 ;       CALL    ASCII_LOOKUP
+                      00369 ;       CALL    SERI_GONDER
+                      00370 ;       CALL    GECIKME
+                      00371 ;       
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00372 ;       MOVF    BIRLER,W
+                      00373 ;       CALL    ASCII_LOOKUP
+                      00374 ;       CALL    SERI_GONDER
+                      00375 ;       CALL    GECIKME
+                      00376 ;       RETURN
+                      00377 ;;*********************************
+                      00378 ;ISLEM
+                      00379 ;
+                      00380 ;       MOVF    SAYI_2,W
+                      00381 ;       ADDWF   SAYI_H,1
+                      00382 ;       
+                      00383 ;AA
+                      00384 ;       MOVF    SAYI_1,1
+                      00385 ;       BTFSC   STATUS,Z
+                      00386 ;       RETURN
+                      00387 ;       BCF     STATUS,Z
+                      00388 ;       DECF    SAYI_1,1
+                      00389 ;       INCF    SAYI_L,1
+                      00390 ;       MOVLW   0x00
+                      00391 ;       SUBWF   SAYI_L,0
+                      00392 ;       BTFSS   STATUS,Z
+                      00393 ;       GOTO    AA
+                      00394 ;       CLRF    SAYI_L
+                      00395 ;       INCF    SAYI_H,1
+                      00396 ;       GOTO    AA
+                      00397 ;       
+                      00398 ;;*****************************
+                      00399 ;BAS
+                      00400 ;       CALL    USART_AYAR
+                      00401 ;       CALL    KESME_AYAR
+                      00402 ;       MOVLW   0xFF
+                      00403 ;       MOVWF   SAYI_1
+                      00404 ;       MOVLW   0x03
+                      00405 ;       MOVWF   SAYI_2
+                      00406 ;       MOVLW   0xFF
+                      00407 ;       MOVWF   SAYI_L
+                      00408 ;       MOVLW   0x03
+                      00409 ;       MOVWF   SAYI_H
+                      00410 ;       CALL    ISLEM
+                      00411 ;       CALL    CEVIR
+                      00412 ;       CALL    GECIKME
+                      00413 ;       CALL    ASCII_AYAR
+                      00414 ;
+                      00415 ;QQ
+                      00416 ;       GOTO    QQ
+                      00417 ;
+                      00418 ;       END
+                      00419     
+                      00420     
+                      00421     
+                      00422     
+                      00423     ;   ;1 BYTE LIK 2 sayinin toplami, sonuc 2 bytle olacak sekilde
+                      00424 ;       list            p=16f877A       
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00425 ;       #include        <p16f877A.inc>  
+                      00426 ;       
+                      00427 ;       __CONFIG H'3F31'
+                      00428 ;G1     EQU 0x20
+                      00429 ;G2     EQU 0x21
+                      00430 ;G3     EQU 0x22
+                      00431 ;SAYAC  EQU 0x23
+                      00432 ;SAYI_L EQU 0x24
+                      00433 ;SAYI_H EQU 0x25
+                      00434 ;TEMP_L EQU 0x26
+                      00435 ;BINLER EQU 0x27
+                      00436 ;YUZLER EQU 0x28
+                      00437 ;ONLAR  EQU 0x29
+                      00438 ;BIRLER EQU 0x30
+                      00439 ;SAYI_1 EQU 0x31
+                      00440 ;SAYI_2 EQU 0x32
+                      00441 ;;*******************************
+                      00442 ;       ORG 0x000
+                      00443 ;       NOP
+                      00444 ;       GOTO    BAS
+                      00445 ;;***************************
+                      00446 ;       ORG 0x004
+                      00447 ;       RETFIE
+                      00448 ;;***************************
+                      00449 ;ASCII_LOOKUP
+                      00450 ;       ADDWF   PCL,1
+                      00451 ;       RETLW   0x30
+                      00452 ;       RETLW   0x31
+                      00453 ;       RETLW   0x32
+                      00454 ;       RETLW   0x33
+                      00455 ;       RETLW   0x34
+                      00456 ;       RETLW   0x35
+                      00457 ;       RETLW   0x36
+                      00458 ;       RETLW   0x37
+                      00459 ;       RETLW   0x38
+                      00460 ;       RETLW   0x39
+                      00461 ;;;*************************************
+                      00462 ;GECIKME
+                      00463 ;;      MOVLW   0x01
+                      00464 ;;      MOVWF   G1
+                      00465 ;       MOVLW   0x50
+                      00466 ;       MOVWF   G2
+                      00467 ;       MOVLW   0xFF
+                      00468 ;       MOVWF   G3
+                      00469 ;       
+                      00470 ;LOOP
+                      00471 ;       DECFSZ  G3,1
+                      00472 ;       GOTO    LOOP
+                      00473 ;       DECFSZ  G2,1
+                      00474 ;       GOTO    LOOP
+                      00475 ;;      DECFSZ  G1,1
+                      00476 ;;      GOTO    LOOP
+                      00477 ;       RETURN
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00478 ;;***************************
+                      00479 ;USART_AYAR
+                      00480 ;       BANKSEL TRISC
+                      00481 ;       MOVLW   B'10000000'
+                      00482 ;       MOVWF   TRISC
+                      00483 ;       
+                      00484 ;       MOVLW   0x19
+                      00485 ;       MOVWF   SPBRG
+                      00486 ;       
+                      00487 ;       MOVLW   0x26
+                      00488 ;       MOVWF   TXSTA
+                      00489 ;       
+                      00490 ;       BANKSEL RCSTA
+                      00491 ;       MOVLW   0x90
+                      00492 ;       MOVWF   RCSTA
+                      00493 ;       RETURN  
+                      00494 ;;**************************
+                      00495 ;KESME_AYAR
+                      00496 ;       BANKSEL PIE1
+                      00497 ;       BCF     PIE1,TXIE
+                      00498 ;       
+                      00499 ;       BANKSEL INTCON
+                      00500 ;       BCF     INTCON,GIE
+                      00501 ;       RETURN
+                      00502 ;;************************
+                      00503 ;SERI_GONDER
+                      00504 ;       BTFSS   PIR1,TXIF
+                      00505 ;       GOTO    $-1
+                      00506 ;       
+                      00507 ;       BCF     PIR1,TXIF
+                      00508 ;       BANKSEL TXREG
+                      00509 ;       MOVWF   TXREG
+                      00510 ;       RETURN
+                      00511 ;;***************************** 
+                      00512 ;CEVIR
+                      00513 ;       MOVF    SAYI_H,1
+                      00514 ;       BTFSC   STATUS,Z
+                      00515 ;       GOTO    ATLA
+                      00516 ;       CALL    CEVIR_H
+                      00517 ;ATLA
+                      00518 ;       CALL    CEVIR_L
+                      00519 ;       RETURN
+                      00520 ;;****************************
+                      00521 ;CEVIR_H
+                      00522 ;       MOVF    SAYI_L,W
+                      00523 ;       MOVWF   TEMP_L
+                      00524 ;HH
+                      00525 ;       INCF    BIRLER,1
+                      00526 ;       MOVLW   0xFF
+                      00527 ;       MOVWF   SAYI_L
+                      00528 ;       CALL    CEVIR_L
+                      00529 ;       DECFSZ  SAYI_H,1
+                      00530 ;       GOTO    HH
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00531 ;       
+                      00532 ;       MOVF    TEMP_L,W
+                      00533 ;       MOVWF   SAYI_L
+                      00534 ;       RETURN
+                      00535 ;;****************************
+                      00536 ;CEVIR_L
+                      00537 ;       BCF     STATUS,Z
+                      00538 ;       MOVF    SAYI_L,1
+                      00539 ;       BTFSC   STATUS,Z
+                      00540 ;       RETURN
+                      00541 ;       
+                      00542 ;       BCF     STATUS,Z
+                      00543 ;       DECF    SAYI_L,1
+                      00544 ;       INCF    BIRLER,1
+                      00545 ;       MOVLW   0x0A
+                      00546 ;       SUBWF   BIRLER,0
+                      00547 ;       BTFSS   STATUS,Z
+                      00548 ;       GOTO    CEVIR_L
+                      00549 ;       
+                      00550 ;       BCF     STATUS,Z
+                      00551 ;       CLRF    BIRLER
+                      00552 ;       INCF    ONLAR,1
+                      00553 ;       MOVLW   0x0A
+                      00554 ;       SUBWF   ONLAR,0
+                      00555 ;       BTFSS   STATUS,Z
+                      00556 ;       GOTO    CEVIR_L
+                      00557 ;       
+                      00558 ;       BCF     STATUS,Z
+                      00559 ;       CLRF    ONLAR
+                      00560 ;       INCF    YUZLER,1
+                      00561 ;       MOVLW   0x0A
+                      00562 ;       SUBWF   YUZLER,0
+                      00563 ;       BTFSS   STATUS,Z
+                      00564 ;       GOTO    CEVIR_L
+                      00565 ;       
+                      00566 ;       BCF     STATUS,Z
+                      00567 ;       CLRF    YUZLER
+                      00568 ;       INCF    BINLER,1
+                      00569 ;       MOVLW   0x0A
+                      00570 ;       SUBWF   BINLER,0
+                      00571 ;       BTFSS   STATUS,Z
+                      00572 ;       GOTO    CEVIR_L
+                      00573 ;       RETURN
+                      00574 ;;******************************
+                      00575 ;ASCII_AYAR
+                      00576 ;       MOVF    BINLER,W
+                      00577 ;       CALL    ASCII_LOOKUP
+                      00578 ;       CALL    SERI_GONDER
+                      00579 ;       CALL    GECIKME
+                      00580 ;       
+                      00581 ;       MOVF    YUZLER,W
+                      00582 ;       CALL    ASCII_LOOKUP
+                      00583 ;       CALL    SERI_GONDER
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00584 ;       CALL    GECIKME
+                      00585 ;       
+                      00586 ;       MOVF    ONLAR,W
+                      00587 ;       CALL    ASCII_LOOKUP
+                      00588 ;       CALL    SERI_GONDER
+                      00589 ;       CALL    GECIKME
+                      00590 ;       
+                      00591 ;       MOVF    BIRLER,W
+                      00592 ;       CALL    ASCII_LOOKUP
+                      00593 ;       CALL    SERI_GONDER
+                      00594 ;       CALL    GECIKME
+                      00595 ;       RETURN
+                      00596 ;;*********************************
+                      00597 ;ISLEM
+                      00598 ;       CLRF    SAYI_L
+                      00599 ;       CLRF    SAYI_H
+                      00600 ;       MOVF    SAYI_1,W
+                      00601 ;       MOVWF   SAYI_L
+                      00602 ;       
+                      00603 ;AA
+                      00604 ;       MOVF    SAYI_2,1
+                      00605 ;       BTFSC   STATUS,Z
+                      00606 ;       RETURN
+                      00607 ;       BCF     STATUS,Z
+                      00608 ;       DECF    SAYI_2,1
+                      00609 ;       INCF    SAYI_L,1
+                      00610 ;       MOVLW   0x00
+                      00611 ;       SUBWF   SAYI_L,0
+                      00612 ;       BTFSS   STATUS,Z
+                      00613 ;       GOTO    AA
+                      00614 ;       CLRF    SAYI_L
+                      00615 ;       INCF    SAYI_H,1
+                      00616 ;       GOTO    AA
+                      00617 ;       
+                      00618 ;;*****************************
+                      00619 ;BAS
+                      00620 ;       CALL    USART_AYAR
+                      00621 ;       CALL    KESME_AYAR
+                      00622 ;       MOVLW   0xFF
+                      00623 ;       MOVWF   SAYI_1
+                      00624 ;       MOVLW   0x10
+                      00625 ;       MOVWF   SAYI_2
+                      00626 ;       CALL    ISLEM
+                      00627 ;       CALL    CEVIR
+                      00628 ;       CALL    GECIKME
+                      00629 ;       CALL    ASCII_AYAR
+                      00630 ;
+                      00631 ;QQ
+                      00632 ;       GOTO    QQ
+                      00633 ;
+                      00634 ;       END
+                      00635     
+                      00636     
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00637     
+                      00638     
+                      00639     ;    ;2BYTE lik 2 sayinin toplamini dolayl? adresleme ve normal sekilde  karsiya veri gonderme
+                      00640 ;       list            p=16f877A       
+                      00641 ;       #include        <p16f877A.inc>  
+                      00642 ;       
+                      00643 ;       __CONFIG H'3F31'
+                      00644 ;G1     EQU 0x20
+                      00645 ;G2     EQU 0x21
+                      00646 ;G3     EQU 0x22
+                      00647 ;SAYAC  EQU 0x23
+                      00648 ;SAYI_L EQU 0x24
+                      00649 ;SAYI_H EQU 0x25
+                      00650 ;TEMP_L EQU 0x26
+                      00651 ;BINLER EQU 0x27
+                      00652 ;YUZLER EQU 0x28
+                      00653 ;ONLAR  EQU 0x29
+                      00654 ;BIRLER EQU 0x30
+                      00655 ;;*******************************
+                      00656 ;       ORG 0x000
+                      00657 ;       NOP
+                      00658 ;       GOTO    BAS
+                      00659 ;;***************************
+                      00660 ;       ORG 0x004
+                      00661 ;       RETFIE
+                      00662 ;;***************************
+                      00663 ;ASCII_LOOKUP
+                      00664 ;       ADDWF   PCL,1
+                      00665 ;       RETLW   0x30
+                      00666 ;       RETLW   0x31
+                      00667 ;       RETLW   0x32
+                      00668 ;       RETLW   0x33
+                      00669 ;       RETLW   0x34
+                      00670 ;       RETLW   0x35
+                      00671 ;       RETLW   0x36
+                      00672 ;       RETLW   0x37
+                      00673 ;       RETLW   0x38
+                      00674 ;       RETLW   0x39
+                      00675 ;;;*************************************
+                      00676 ;GECIKME
+                      00677 ;;      MOVLW   0x01
+                      00678 ;;      MOVWF   G1
+                      00679 ;       MOVLW   0x50
+                      00680 ;       MOVWF   G2
+                      00681 ;       MOVLW   0xFF
+                      00682 ;       MOVWF   G3
+                      00683 ;       
+                      00684 ;LOOP
+                      00685 ;       DECFSZ  G3,1
+                      00686 ;       GOTO    LOOP
+                      00687 ;       DECFSZ  G2,1
+                      00688 ;       GOTO    LOOP
+                      00689 ;;      DECFSZ  G1,1
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 14
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00690 ;;      GOTO    LOOP
+                      00691 ;       RETURN
+                      00692 ;;***************************
+                      00693 ;USART_AYAR
+                      00694 ;       BANKSEL TRISC
+                      00695 ;       MOVLW   B'10000000'
+                      00696 ;       MOVWF   TRISC
+                      00697 ;       
+                      00698 ;       MOVLW   0x19
+                      00699 ;       MOVWF   SPBRG
+                      00700 ;       
+                      00701 ;       MOVLW   0x26
+                      00702 ;       MOVWF   TXSTA
+                      00703 ;       
+                      00704 ;       BANKSEL RCSTA
+                      00705 ;       MOVLW   0x90
+                      00706 ;       MOVWF   RCSTA
+                      00707 ;       RETURN  
+                      00708 ;;**************************
+                      00709 ;KESME_AYAR
+                      00710 ;       BANKSEL PIE1
+                      00711 ;       BCF     PIE1,TXIE
+                      00712 ;       
+                      00713 ;       BANKSEL INTCON
+                      00714 ;       BCF     INTCON,GIE
+                      00715 ;       RETURN
+                      00716 ;;************************
+                      00717 ;SERI_GONDER
+                      00718 ;       BTFSS   PIR1,TXIF
+                      00719 ;       GOTO    $-1
+                      00720 ;       
+                      00721 ;       BCF     PIR1,TXIF
+                      00722 ;       BANKSEL TXREG
+                      00723 ;       MOVWF   TXREG
+                      00724 ;       RETURN
+                      00725 ;;***************************** 
+                      00726 ;CEVIR
+                      00727 ;       MOVF    SAYI_H,1
+                      00728 ;       BTFSC   STATUS,Z
+                      00729 ;       GOTO    ATLA
+                      00730 ;       CALL    CEVIR_H
+                      00731 ;ATLA
+                      00732 ;       CALL    CEVIR_L
+                      00733 ;       RETURN
+                      00734 ;;****************************
+                      00735 ;CEVIR_H
+                      00736 ;       MOVF    SAYI_L,W
+                      00737 ;       MOVWF   TEMP_L
+                      00738 ;HH
+                      00739 ;       INCF    BIRLER,1
+                      00740 ;       MOVLW   0xFF
+                      00741 ;       MOVWF   SAYI_L
+                      00742 ;       CALL    CEVIR_L
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 15
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00743 ;       DECFSZ  SAYI_H,1
+                      00744 ;       GOTO    HH
+                      00745 ;       
+                      00746 ;       MOVF    TEMP_L,W
+                      00747 ;       MOVWF   SAYI_L
+                      00748 ;       RETURN
+                      00749 ;;****************************
+                      00750 ;CEVIR_L
+                      00751 ;       BCF     STATUS,Z
+                      00752 ;       MOVF    SAYI_L,1
+                      00753 ;       BTFSC   STATUS,Z
+                      00754 ;       RETURN
+                      00755 ;       
+                      00756 ;       BCF     STATUS,Z
+                      00757 ;       DECF    SAYI_L,1
+                      00758 ;       INCF    BIRLER,1
+                      00759 ;       MOVLW   0x0A
+                      00760 ;       SUBWF   BIRLER,0
+                      00761 ;       BTFSS   STATUS,Z
+                      00762 ;       GOTO    CEVIR_L
+                      00763 ;       
+                      00764 ;       BCF     STATUS,Z
+                      00765 ;       CLRF    BIRLER
+                      00766 ;       INCF    ONLAR,1
+                      00767 ;       MOVLW   0x0A
+                      00768 ;       SUBWF   ONLAR,0
+                      00769 ;       BTFSS   STATUS,Z
+                      00770 ;       GOTO    CEVIR_L
+                      00771 ;       
+                      00772 ;       BCF     STATUS,Z
+                      00773 ;       CLRF    ONLAR
+                      00774 ;       INCF    YUZLER,1
+                      00775 ;       MOVLW   0x0A
+                      00776 ;       SUBWF   YUZLER,0
+                      00777 ;       BTFSS   STATUS,Z
+                      00778 ;       GOTO    CEVIR_L
+                      00779 ;       
+                      00780 ;       BCF     STATUS,Z
+                      00781 ;       CLRF    YUZLER
+                      00782 ;       INCF    BINLER,1
+                      00783 ;       MOVLW   0x0A
+                      00784 ;       SUBWF   BINLER,0
+                      00785 ;       BTFSS   STATUS,Z
+                      00786 ;       GOTO    CEVIR_L
+                      00787 ;       RETURN
+                      00788 ;;******************************
+                      00789 ;ASCII_AYAR
+                      00790 ;       MOVF    BINLER,W
+                      00791 ;       CALL    ASCII_LOOKUP
+                      00792 ;       CALL    SERI_GONDER
+                      00793 ;       CALL    GECIKME
+                      00794 ;       
+                      00795 ;       MOVF    YUZLER,W
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 16
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00796 ;       CALL    ASCII_LOOKUP
+                      00797 ;       CALL    SERI_GONDER
+                      00798 ;       CALL    GECIKME
+                      00799 ;       
+                      00800 ;       MOVF    ONLAR,W
+                      00801 ;       CALL    ASCII_LOOKUP
+                      00802 ;       CALL    SERI_GONDER
+                      00803 ;       CALL    GECIKME
+                      00804 ;       
+                      00805 ;       MOVF    BIRLER,W
+                      00806 ;       CALL    ASCII_LOOKUP
+                      00807 ;       CALL    SERI_GONDER
+                      00808 ;       CALL    GECIKME
+                      00809 ;       RETURN
+                      00810 ;;*********************************
+                      00811 ;BAS
+                      00812 ;       CALL    USART_AYAR
+                      00813 ;       CALL    KESME_AYAR
+                      00814 ;       MOVLW   0x27
+                      00815 ;       MOVWF   SAYAC
+                      00816 ;       MOVLW   0xFF
+                      00817 ;       MOVWF   SAYI_L
+                      00818 ;       MOVLW   0x03
+                      00819 ;       MOVWF   SAYI_H
+                      00820 ;       CALL    CEVIR
+                      00821 ;       CALL    ASCII_AYAR
+                      00822 ;       CALL    GECIKME
+                      00823 ;;AA
+                      00824 ;;      MOVF    SAYAC,W
+                      00825 ;;      MOVWF   FSR
+                      00826 ;;      MOVF    INDF,W
+                      00827 ;;      CALL    SERI_GONDER
+                      00828 ;;      CALL    GECIKME
+                      00829 ;;      INCF    SAYAC,1
+                      00830 ;;      MOVLW   0x31
+                      00831 ;;      SUBWF   SAYAC,0
+                      00832 ;;      BTFSS   STATUS,Z
+                      00833 ;;      GOTO    AA
+                      00834 ;       
+                      00835 ;FF
+                      00836 ;       GOTO    FF
+                      00837 ;       END
+                      00838     
+                      00839         
+                      00840         
+                      00841         
+                      00842     
+                      00843         ;dolayl? adresleme ile karsiya veri gonderme
+                      00844         list            p=16f877A       
+                      00845         #include        <p16f877A.inc>  
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 17
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00004 ; Build date : Mar 17 2019
+                      00005 ;  MPASM PIC16F877A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2019 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00567         LIST
+                      00846         
+2007   3F31           00847         __CONFIG H'3F31'
+  00000020            00848 G1      EQU 0x20
+  00000021            00849 G2      EQU 0x21
+  00000022            00850 G3      EQU 0x22
+  00000023            00851 SAYAC   EQU 0x23
+  00000024            00852 SAYI_L  EQU 0x24
+  00000025            00853 SAYI_H  EQU 0x25
+                      00854 ;*******************************
+                      00855         ORG 0x000
+0000   0000           00856         NOP
+0001   2???           00857         GOTO    BAS
+                      00858 ;***************************
+                      00859         ORG 0x004
+0004   0009           00860         RETFIE
+                      00861 ;***************************
+0005                  00862 GECIKME
+                      00863 ;       MOVLW   0x01
+                      00864 ;       MOVWF   G1
+0005   3050           00865         MOVLW   0x50
+0006   00A1           00866         MOVWF   G2
+0007   30FF           00867         MOVLW   0xFF
+0008   00A2           00868         MOVWF   G3
+                      00869         
+0009                  00870 LOOP
+0009   0BA2           00871         DECFSZ  G3,1
+000A   2???           00872         GOTO    LOOP
+000B   0BA1           00873         DECFSZ  G2,1
+000C   2???           00874         GOTO    LOOP
+                      00875 ;       DECFSZ  G1,1
+                      00876 ;       GOTO    LOOP
+000D   0008           00877         RETURN
+                      00878 ;***************************
+000E                  00879 USART_AYAR
+000E   1683 1303      00880         BANKSEL TRISC
+0010   3080           00881         MOVLW   B'10000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0011   0087           00882         MOVWF   TRISC
+                      00883         
+0012   3019           00884         MOVLW   0x19
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0013   0099           00885         MOVWF   SPBRG
+                      00886         
+0014   3026           00887         MOVLW   0x26
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0015   0098           00888         MOVWF   TXSTA
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 18
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00889         
+0016   1283 1303      00890         BANKSEL RCSTA
+0018   3090           00891         MOVLW   0x90
+0019   0098           00892         MOVWF   RCSTA
+001A   0008           00893         RETURN  
+                      00894 ;**************************
+001B                  00895 KESME_AYAR
+001B   1683 1303      00896         BANKSEL PIE1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001D   120C           00897         BCF     PIE1,TXIE
+                      00898         
+001E   1283 1303      00899         BANKSEL INTCON
+0020   138B           00900         BCF     INTCON,GIE
+0021   0008           00901         RETURN
+                      00902 ;************************
+0022                  00903 SERI_GONDER
+0022   1E0C           00904         BTFSS   PIR1,TXIF
+0023   2???           00905         GOTO    $-1
+                      00906         
+0024   120C           00907         BCF     PIR1,TXIF
+0025   1283 1303      00908         BANKSEL TXREG
+0027   0099           00909         MOVWF   TXREG
+0028   0008           00910         RETURN
+                      00911 ;*****************************  
+0029                  00912 BAS
+0029   2???           00913         CALL    USART_AYAR
+002A   2???           00914         CALL    KESME_AYAR
+002B   3023           00915         MOVLW   0x23
+002C   00A3           00916         MOVWF   SAYAC
+002D   3030           00917         MOVLW   0x30
+002E   00A4           00918         MOVWF   SAYI_L
+002F   3031           00919         MOVLW   0x31
+0030   00A5           00920         MOVWF   SAYI_H
+                      00921         
+0031                  00922 AA
+0031   0823           00923         MOVF    SAYAC,W
+0032   0084           00924         MOVWF   FSR
+0033   0800           00925         MOVF    INDF,W
+0034   2???           00926         CALL    SERI_GONDER
+0035   2???           00927         CALL    GECIKME
+0036   0AA3           00928         INCF    SAYAC,1
+0037   3026           00929         MOVLW   0x26
+0038   0223           00930         SUBWF   SAYAC,0
+0039   1D03           00931         BTFSS   STATUS,Z
+003A   2???           00932         GOTO    AA
+                      00933         
+                      00934         
+003B                  00935 FF
+003B   2???           00936         GOTO    FF
+3F31                  00937         END
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+AA                                00000031
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+BAS                               00000029
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 20
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+D_A                               00000005
+D_NOT_A                           00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FF                                0000003B
+FSR                               00000004
+G1                                00000020
+G2                                00000021
+G3                                00000022
+GCEN                              00000007
+GECIKME                           00000005
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INDF                              00000000
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 21
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+KESME_AYAR                        0000001B
+LOOP                              00000009
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+R                                 00000002
+RA0                               00000000
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 22
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+SAYAC                             00000023
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 23
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+SAYI_H                            00000025
+SAYI_L                            00000024
+SEN                               00000000
+SERI_GONDER                       00000022
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 24
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+USART_AYAR                        0000000E
+W                                 00000000
+WCOL                              00000007
+MPASM 5.84                        USART0.ASM   12-20-2021  19:34:40         PAGE 25
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_.org_1_0023                      00000023
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     4 reported,     0 suppressed
+
+

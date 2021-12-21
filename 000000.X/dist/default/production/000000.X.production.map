@@ -1,0 +1,55 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Thu Dec 09 16:35:37 2021
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000004
+                   .cinit    romdata   0x000002    program   0x000004
+                   .org_1       code   0x000004    program   0x00008a
+.config_2007_BUILD/DEFAULT/PRODUCTION/000000.       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000048      
+                            0x002007    0x002007      
+            74 out of 8454 program addresses used, program memory utilization is 0%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                 ADC_AYAR   0x000023    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                  ADC_OKU   0x00002c    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                    BASLA   0x000045    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                       DD   0x000047    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                  GECIKME   0x000005    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                    ISLEM   0x00000e    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                     LOOP   0x000009    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                PORT_AYAR   0x00003a    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                      SAG   0x00001b    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                      SOL   0x000013    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                       TT   0x00002f    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  GECIKME   0x000005    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                     LOOP   0x000009    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                    ISLEM   0x00000e    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                      SOL   0x000013    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                      SAG   0x00001b    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                 ADC_AYAR   0x000023    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                  ADC_OKU   0x00002c    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                       TT   0x00002f    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                PORT_AYAR   0x00003a    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                    BASLA   0x000045    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+                       DD   0x000047    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\000000.X\000000.asm
+
+

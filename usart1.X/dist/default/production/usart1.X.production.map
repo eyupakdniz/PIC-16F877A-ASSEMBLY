@@ -1,0 +1,55 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Tue Dec 21 11:26:22 2021
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000004
+                   .cinit    romdata   0x000002    program   0x000004
+                   .org_1       code   0x000004    program   0x0000fa
+.config_2007_BUILD/DEFAULT/PRODUCTION/USART1.       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000080      
+                            0x002007    0x002007      
+            130 out of 8454 program addresses used, program memory utilization is 1%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                      BAS   0x000069    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                      CIK   0x000011    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                       DD   0x000080    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+           GECIKME_200USN   0x000018    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+               KESME_AYAR   0x00002c    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                 LCD_AYAR   0x000035    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+               LCD_GONDER   0x000052    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                     LOOP   0x00001a    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                       SS   0x000064    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                    TETIK   0x00004c    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+               USART_AYAR   0x00001d    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                      CIK   0x000011    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+           GECIKME_200USN   0x000018    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                     LOOP   0x00001a    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+               USART_AYAR   0x00001d    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+               KESME_AYAR   0x00002c    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                 LCD_AYAR   0x000035    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                    TETIK   0x00004c    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+               LCD_GONDER   0x000052    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                       SS   0x000064    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                      BAS   0x000069    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+                       DD   0x000080    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\usart1.X\usart1.asm
+
+

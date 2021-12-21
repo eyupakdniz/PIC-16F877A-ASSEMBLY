@@ -1,0 +1,41 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Sat Oct 30 14:26:12 2021
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000004
+                   .cinit    romdata   0x000002    program   0x000004
+                   .org_1       code   0x000004    program   0x00001e
+.config_2007_BUILD/DEFAULT/PRODUCTION/ILK_GEC       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000012      
+                            0x002007    0x002007      
+            20 out of 8454 program addresses used, program memory utilization is 0%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    BASLA   0x000009    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+                    DONGU   0x00000e    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+                  GECIKME   0x000004    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+                     LOOP   0x000006    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  GECIKME   0x000004    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+                     LOOP   0x000006    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+                    BASLA   0x000009    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+                    DONGU   0x00000e    program     static C:\Users\Eyüp AKDENÝZ\Desktop\New Folder\GECIKME.X\ILK_GECIKME.asm
+
+
