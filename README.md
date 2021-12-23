@@ -1,2 +1,2 @@
 # PIC16F877A-ASSEMBLY
- assembly for pic16f877
+ assembly for pic16f877a
